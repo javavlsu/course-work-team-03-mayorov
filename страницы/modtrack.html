@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Модерация треков - Личный кабинет музыканта</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #181818;
+            --card-bg: #1e1e1e;
+            --hover-bg: #282828;
+            --accent: #ffdb4d;
+            --accent-hover: #ffcc00;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --success: #1db954;
+            --warning: #ff9800;
+            --danger: #e22134;
+            --info: #2196f3;
+            --purple: #9c27b0;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+			background-image: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Навигационная панель */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            transition: background-color 0.2s;
+        }
+        
+        .back-btn:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .navbar-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .artist-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0.2s, background-color 0.2s;
+        }
+        
+        .action-btn:hover {
+            color: var(--text-primary);
+            background-color: var(--hover-bg);
+        }
+        
+        /* Заголовок страницы */
+        .page-header {
+            padding-top: 70px;
+            padding-bottom: 30px;
+            background: linear-gradient(to bottom, #1a1a1a, #121212);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .upload-btn {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .upload-btn:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        /* Фильтры и поиск */
+        .filters-section {
+            margin-bottom: 30px;
+        }
+        
+        .filters-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 10px 15px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .search-box {
+            position: relative;
+            flex: 2;
+            min-width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 70%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        
+        /* Статус фильтры */
+        .status-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .status-filter {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: var(--card-bg);
+            font-size: 14px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        
+        .status-filter:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .status-filter.active {
+            font-weight: 600;
+        }
+        
+        .status-filter.all {
+            color: var(--text-primary);
+        }
+        
+        .status-filter.pending {
+            color: var(--warning);
+        }
+        
+        .status-filter.pending {
+            color: var(--info);
+        }
+        
+        .status-filter.approved {
+            color: var(--success);
+        }
+        
+        .status-filter.rejected {
+            color: var(--danger);
+        }
+        
+        /* Статистика модерации */
+        .stats-section {
+            margin-bottom: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 20px;
+        }
+        
+        .stat-icon.all {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+        
+        .stat-icon.pending {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .stat-icon.pending {
+            background-color: rgba(33, 150, 243, 0.1);
+            color: var(--info);
+        }
+        
+        .stat-icon.approved {
+            background-color: rgba(29, 185, 84, 0.1);
+            color: var(--success);
+        }
+        
+        .stat-icon.rejected {
+            background-color: rgba(226, 33, 52, 0.1);
+            color: var(--danger);
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Таблица треков */
+        .tracks-section {
+            margin-bottom: 100px;
+        }
+        
+        .tracks-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .tracks-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .tracks-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tracks-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .tracks-table tr:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .track-info-cell {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .track-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .track-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .track-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .track-artist {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Статус модерации */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-pending {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-pending {
+            background-color: rgba(33, 150, 243, 0.1);
+            color: var(--info);
+        }
+        
+        .status-approved {
+            background-color: rgba(29, 185, 84, 0.1);
+            color: var(--success);
+        }
+        
+        .status-rejected {
+            background-color: rgba(226, 33, 52, 0.1);
+            color: var(--danger);
+        }
+        
+        .status-draft {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+        
+        /* Действия */
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0.2s, background-color 0.2s;
+        }
+        
+        .table-action-btn:hover {
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Пагинация */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .pagination-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            transition: background-color 0.2s;
+        }
+        
+        .pagination-btn:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .pagination-btn.active {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        .pagination-dots {
+            color: var(--text-secondary);
+        }
+        
+        /* Пустое состояние */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .empty-description {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+        
+        /* Нижняя панель навигации */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--primary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-item.active {
+            color: var(--accent);
+        }
+        
+        .nav-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        .nav-label {
+            font-size: 12px;
+        }
+        
+        /* Модальное окно деталей модерации */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 25px 25px 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: background-color 0.2s;
+        }
+        
+        .modal-close:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .modal-content {
+            padding: 25px;
+        }
+        
+        .modal-section {
+            margin-bottom: 25px;
+        }
+        
+        .modal-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .track-details-modal {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .track-details-modal .track-image {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .track-details-text .track-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .track-details-text .track-artist {
+            font-size: 16px;
+        }
+        
+        .modal-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-info-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .modal-info-value {
+            font-weight: 500;
+        }
+        
+        .modal-comments {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .modal-comments-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .modal-comments-text {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .modal-btn {
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .modal-btn.secondary {
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+        }
+        
+        .modal-btn.secondary:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .modal-btn.primary {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        .modal-btn.primary:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 992px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .tracks-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .modal-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .upload-btn {
+                align-self: flex-start;
+            }
+            
+            .filters-row {
+                flex-direction: column;
+            }
+            
+            .filter-group, .search-box {
+                min-width: 100%;
+            }
+            
+            .tracks-table th, .tracks-table td {
+                padding: 12px 15px;
+            }
+            
+            .track-details-modal {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .status-filters {
+                justify-content: center;
+            }
+            
+            .page-title {
+                font-size: 24px;
+            }
+            
+            .tracks-table {
+                font-size: 14px;
+            }
+            
+            .track-info-cell {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .track-image {
+                width: 40px;
+                height: 40px;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .track-row {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        /* Прогресс модерации */
+        .moderation-progress {
+            margin-top: 10px;
+        }
+        
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--secondary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-bottom: 8px;
+            border: 2px solid var(--border-color);
+        }
+        
+        .step-icon.completed {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+        
+        .step-icon.current {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            border-color: var(--accent);
+        }
+        
+        .step-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        /* Сортировка */
+        .sort-header {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .sort-header:hover {
+            color: var(--text-primary);
+        }
+        
+        .sort-icon {
+            margin-left: 5px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            z-index: 3000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(100%);
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .notification.error {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .notification.info {
+            background-color: var(--info);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя навигационная панель -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <div style="display: flex; align-items: center;">
+                <button class="back-btn" id="backBtn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">Модерация треков</div>
+            </div>
+            
+            <div class="artist-actions">
+                <button class="action-btn" title="Обновить">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="action-btn" title="Настройки">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Заголовок страницы -->
+            <header class="page-header">
+                <div class="header-content">
+                    <h1 class="page-title">Мои треки на модерации</h1>
+                    <button class="upload-btn" id="uploadNewBtn">
+                        <i class="fas fa-plus"></i>
+                        Загрузить новый трек
+                    </button>
+                </div>
+                
+                <!-- Фильтры и поиск -->
+                <div class="filters-section">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label class="filter-label">Сортировка</label>
+                            <select class="filter-select" id="sortSelect">
+                                <option value="newest">Сначала новые</option>
+                                <option value="oldest">Сначала старые</option>
+                                <option value="name">По названию</option>
+                                <option value="status">По статусу</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Жанр</label>
+                            <select class="filter-select" id="genreFilter">
+                                <option value="all">Все жанры</option>
+                                <option value="pop">Поп</option>
+                                <option value="rock">Рок</option>
+                                <option value="hiphop">Хип-хоп</option>
+                                <option value="electronic">Электроника</option>
+                                <option value="indie">Инди</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-box">
+							<label class="filter-label">Поиск</label>
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Поиск по названию трека...">
+                        </div>
+                    </div>
+                    
+                    <!-- Статус фильтры -->
+                    <div class="status-filters">
+                        <div class="status-filter all active" data-status="all">Все треки</div>
+                        <div class="status-filter pending" data-status="pending">На рассмотрении</div>
+                        <div class="status-filter approved" data-status="approved">Одобрены</div>
+                        <div class="status-filter rejected" data-status="rejected">Отклонены</div>
+                    </div>
+                </div>
+                
+                <!-- Статистика модерации -->
+                <div class="stats-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon all">
+                                <i class="fas fa-music"></i>
+                            </div>
+                            <div class="stat-value">24</div>
+                            <div class="stat-label">Всего треков</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">На рассмотрении</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon approved">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="stat-value">9</div>
+                            <div class="stat-label">Одобрены</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon rejected">
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="stat-value">2</div>
+                            <div class="stat-label">Отклонены</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Таблица треков -->
+            <section class="tracks-section">
+                <table class="tracks-table">
+                    <thead>
+                        <tr>
+                            <th class="sort-header" data-sort="name">
+                                Трек
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th class="sort-header" data-sort="date">
+                                Дата загрузки
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th class="sort-header" data-sort="status">
+                                Статус
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tracksTableBody">
+                        <!-- Треки будут загружены через JavaScript -->
+                    </tbody>
+                </table>
+                
+                <!-- Пустое состояние -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3 class="empty-title">Треки не найдены</h3>
+                    <p class="empty-description">
+                        По вашему запросу не найдено ни одного трека. 
+                        Попробуйте изменить фильтры или загрузите новый трек.
+                    </p>
+                    <button class="upload-btn" id="uploadEmptyBtn">
+                        <i class="fas fa-plus"></i>
+                        Загрузить новый трек
+                    </button>
+                </div>
+                
+                <!-- Пагинация -->
+                <div class="pagination" id="pagination">
+                    <!-- Пагинация будет загружена через JavaScript -->
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- Модальное окно деталей модерации -->
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Детали модерации</h3>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-content" id="modalContent">
+                <!-- Контент будет загружен через JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Уведомление -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Сообщение</span>
+    </div>
+    
+    <!-- Нижняя панель навигации -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <a href="#" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">Главная</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-search nav-icon"></i>
+                <span class="nav-label">Поиск</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-book nav-icon"></i>
+                <span class="nav-label">Библиотека</span>
+            </a>
+            
+            <a href="#" class="nav-item active">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">Кабинет</span>
+            </a>
+        </div>
+    </nav>
+    
+    <script>
+        // JavaScript для страницы модерации треков
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы
+            const backBtn = document.getElementById('backBtn');
+            const uploadNewBtn = document.getElementById('uploadNewBtn');
+            const uploadEmptyBtn = document.getElementById('uploadEmptyBtn');
+            const sortSelect = document.getElementById('sortSelect');
+            const genreFilter = document.getElementById('genreFilter');
+            const searchInput = document.getElementById('searchInput');
+            const statusFilters = document.querySelectorAll('.status-filter');
+            const tracksTableBody = document.getElementById('tracksTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const pagination = document.getElementById('pagination');
+            const detailsModal = document.getElementById('detailsModal');
+            const closeModalBtn = document.getElementById('closeModal');
+            const modalContent = document.getElementById('modalContent');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            // Данные о треках
+            const tracksData = [
+                {
+                    id: 1,
+                    name: "Летний бриз",
+                    artist: "VAKKARY",
+                    album: "Летние дни",
+                    genre: "pop",
+                    date: "2025-05-15",
+                    status: "approved",
+                    statusDate: "2025-05-17",
+                    duration: "3:45",
+                    plays: 124582,
+                    format: "MP3",
+                    size: "8.2 MB",
+                    reviewer: "Модератор 3",
+                    comments: "Отличный трек! Отличное качество звука и интересная аранжировка. Соответствует всем требованиям платформы."
+                },
+                {
+                    id: 2,
+                    name: "Ночной город",
+                    artist: "VAKKARY",
+                    album: "Городские ночи",
+                    genre: "indie",
+                    date: "2025-05-10",
+                    status: "pending",
+                    statusDate: "2025-05-10",
+                    duration: "4:12",
+                    plays: 0,
+                    format: "WAV",
+                    size: "42.5 MB",
+                    reviewer: "",
+                    comments: ""
+                },
+                {
+                    id: 3,
+                    name: "Утренняя роса",
+                    artist: "VAKKARY",
+                    album: "Летние дни",
+                    genre: "pop",
+                    date: "2025-05-12",
+                    status: "pending",
+                    statusDate: "2025-05-16",
+                    duration: "3:28",
+                    plays: 0,
+                    format: "MP3",
+                    size: "7.8 MB",
+                    reviewer: "Петр Проверяющий",
+                    comments: "Трек находится на проверке. Ожидайте решения в течение 2-3 рабочих дней."
+                },
+                {
+                    id: 4,
+                    name: "Осенний дождь",
+                    artist: "VAKKARY",
+                    album: "Времена года",
+                    genre: "electronic",
+                    date: "2025-05-05",
+                    status: "rejected",
+                    statusDate: "2025-05-08",
+                    duration: "5:01",
+                    plays: 0,
+                    format: "MP3",
+                    size: "11.2 MB",
+                    reviewer: "Модератор 1",
+                    comments: "Трек отклонен по причине низкого качества звука. Рекомендуем перезаписать с более высоким битрейтом (минимум 320 kbps). Также обнаружены признаки неправомерного использования семплов."
+                },
+                {
+                    id: 5,
+                    name: "Зимний ветер",
+                    artist: "VAKKARY",
+                    album: "Времена года",
+                    genre: "electronic",
+                    date: "2025-05-03",
+                    status: "approved",
+                    statusDate: "2025-05-06",
+                    duration: "4:33",
+                    plays: 32894,
+                    format: "FLAC",
+                    size: "25.6 MB",
+                    reviewer: "Модератор 2",
+                    comments: "Интересная электронная композиция. Отличное качество звучания."
+                },
+                {
+                    id: 6,
+                    name: "Весеннее пробуждение",
+                    artist: "VAKKARY",
+                    album: "Времена года",
+                    genre: "indie",
+                    date: "2025-05-18",
+                    status: "pending",
+                    statusDate: "2025-05-18",
+                    duration: "3:15",
+                    plays: 0,
+                    format: "MP3",
+                    size: "7.5 MB",
+                    reviewer: "",
+                    comments: ""
+                },
+                {
+                    id: 7,
+                    name: "Городские огни",
+                    artist: "VAKKARY",
+                    album: "Городские ночи",
+                    genre: "indie",
+                    date: "2025-04-28",
+                    status: "approved",
+                    statusDate: "2025-05-02",
+                    duration: "4:45",
+                    plays: 98451,
+                    format: "MP3",
+                    size: "10.8 MB",
+                    reviewer: "Модератор 3",
+                    comments: "Хорошая работа! Трек уже набирает популярность."
+                },
+                {
+                    id: 8,
+                    name: "Метроном",
+                    artist: "VAKKARY",
+                    album: "Эксперименты",
+                    genre: "electronic",
+                    date: "2025-05-20",
+                    status: "pending",
+                    statusDate: "2025-05-21",
+                    duration: "6:22",
+                    plays: 0,
+                    format: "WAV",
+                    size: "68.3 MB",
+                    reviewer: "Петр Проверяющий",
+                    comments: "Проверяем оригинальность композиции и соответствие техническим требованиям."
+                }
+            ];
+            
+            // Состояние фильтрации и сортировки
+            let currentFilter = "all";
+            let currentSort = "newest";
+            let currentGenre = "all";
+            let currentSearch = "";
+            let currentPage = 1;
+            const tracksPerPage = 5;
+            
+            // Инициализация
+            renderTracksTable();
+            updateStats();
+            
+            // Кнопка "Назад"
+            backBtn.addEventListener('click', function() {
+                console.log('Возврат в личный кабинет');
+                // Здесь можно добавить навигацию назад
+                // window.history.back();
+            });
+            
+            // Кнопки загрузки нового трека
+            uploadNewBtn.addEventListener('click', function() {
+                console.log('Открытие формы загрузки нового трека');
+                showNotification('Перенаправление на страницу загрузки трека', 'info');
+                // Здесь можно перейти на страницу загрузки
+                // window.location.href = 'upload.html';
+            });
+            
+            uploadEmptyBtn.addEventListener('click', function() {
+                uploadNewBtn.click();
+            });
+            
+            // Сортировка
+            sortSelect.addEventListener('change', function() {
+                currentSort = this.value;
+                currentPage = 1;
+                renderTracksTable();
+            });
+            
+            // Фильтр по жанру
+            genreFilter.addEventListener('change', function() {
+                currentGenre = this.value;
+                currentPage = 1;
+                renderTracksTable();
+            });
+            
+            // Поиск
+            searchInput.addEventListener('input', function() {
+                currentSearch = this.value.toLowerCase();
+                currentPage = 1;
+                renderTracksTable();
+            });
+            
+            // Фильтры по статусу
+            statusFilters.forEach(filter => {
+                filter.addEventListener('click', function() {
+                    const status = this.getAttribute('data-status');
+                    
+                    // Обновление активного фильтра
+                    statusFilters.forEach(f => f.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    currentFilter = status;
+                    currentPage = 1;
+                    renderTracksTable();
+                });
+            });
+            
+            // Сортировка по заголовкам таблицы
+            document.querySelectorAll('.sort-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const sortField = this.getAttribute('data-sort');
+                    
+                    // Простая реализация сортировки
+                    if (currentSort === `${sortField}-asc`) {
+                        currentSort = `${sortField}-desc`;
+                    } else {
+                        currentSort = `${sortField}-asc`;
+                    }
+                    
+                    renderTracksTable();
+                });
+            });
+            
+            // Функция фильтрации и сортировки треков
+            function getFilteredAndSortedTracks() {
+                let filteredTracks = [...tracksData];
+                
+                // Фильтрация по статусу
+                if (currentFilter !== "all") {
+                    filteredTracks = filteredTracks.filter(track => track.status === currentFilter);
+                }
+                
+                // Фильтрация по жанру
+                if (currentGenre !== "all") {
+                    filteredTracks = filteredTracks.filter(track => track.genre === currentGenre);
+                }
+                
+                // Поиск
+                if (currentSearch) {
+                    filteredTracks = filteredTracks.filter(track => 
+                        track.name.toLowerCase().includes(currentSearch) ||
+                        track.album.toLowerCase().includes(currentSearch)
+                    );
+                }
+                
+                // Сортировка
+                filteredTracks.sort((a, b) => {
+                    switch (currentSort) {
+                        case "newest":
+                            return new Date(b.date) - new Date(a.date);
+                        case "oldest":
+                            return new Date(a.date) - new Date(b.date);
+                        case "name-asc":
+                            return a.name.localeCompare(b.name);
+                        case "name-desc":
+                            return b.name.localeCompare(a.name);
+                        case "date-asc":
+                            return new Date(a.date) - new Date(b.date);
+                        case "date-desc":
+                            return new Date(b.date) - new Date(a.date);
+                        case "status-asc":
+                            return a.status.localeCompare(b.status);
+                        case "status-desc":
+                            return b.status.localeCompare(a.status);
+                        default:
+                            return new Date(b.date) - new Date(a.date);
+                    }
+                });
+                
+                return filteredTracks;
+            }
+            
+            // Функция отображения таблицы треков
+            function renderTracksTable() {
+                const filteredTracks = getFilteredAndSortedTracks();
+                const totalTracks = filteredTracks.length;
+                const totalPages = Math.ceil(totalTracks / tracksPerPage);
+                
+                // Рассчитываем треки для текущей страницы
+                const startIndex = (currentPage - 1) * tracksPerPage;
+                const endIndex = startIndex + tracksPerPage;
+                const pageTracks = filteredTracks.slice(startIndex, endIndex);
+                
+                // Очищаем таблицу
+                tracksTableBody.innerHTML = '';
+                
+                if (pageTracks.length === 0) {
+                    // Показываем пустое состояние
+                    emptyState.style.display = 'flex';
+                    tracksTableBody.style.display = 'none';
+                } else {
+                    // Скрываем пустое состояние
+                    emptyState.style.display = 'none';
+                    tracksTableBody.style.display = 'table-row-group';
+                    
+                    // Добавляем треки в таблицу
+                    pageTracks.forEach(track => {
+                        const row = document.createElement('tr');
+                        row.className = 'track-row';
+                        row.setAttribute('data-track-id', track.id);
+                        
+                        // Форматирование даты
+                        const dateFormatted = formatDate(track.date);
+                        
+                        // Получение статуса
+                        const statusInfo = getStatusInfo(track.status);
+                        
+                        row.innerHTML = `
+                            <td>
+                                <div class="track-info-cell">
+                                    <div class="track-image">
+                                        <i class="fas fa-music"></i>
+                                    </div>
+                                    <div class="track-details">
+                                        <div class="track-name">${track.name}</div>
+                                        <div class="track-artist">${track.artist} • ${track.album}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${dateFormatted}</td>
+                            <td>
+                                <div class="status-badge ${statusInfo.class}">
+                                    <i class="${statusInfo.icon}"></i>
+                                    <span>${statusInfo.text}</span>
+                                </div>
+                                ${track.statusDate ? `<div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">${formatDate(track.statusDate)}</div>` : ''}
+                            </td>
+                            <td>
+                                <div class="actions-cell">
+                                    <button class="table-action-btn view-details-btn" data-track-id="${track.id}" title="Просмотреть детали">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    ${track.status === 'rejected' ? `
+                                        <button class="table-action-btn edit-btn" data-track-id="${track.id}" title="Редактировать и повторно отправить">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    ` : ''}
+                                    ${track.status === 'pending' ? `
+                                        <button class="table-action-btn cancel-btn" data-track-id="${track.id}" title="Отменить отправку">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </td>
+                        `;
+                        
+                        tracksTableBody.appendChild(row);
+                    });
+                }
+                
+                // Обновляем пагинацию
+                renderPagination(totalPages);
+                
+                // Добавляем обработчики событий для кнопок действий
+                addTableEventListeners();
+            }
+            
+            // Функция отображения пагинации
+            function renderPagination(totalPages) {
+                pagination.innerHTML = '';
+                
+                if (totalPages <= 1) return;
+                
+                // Кнопка "Назад"
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'pagination-btn';
+                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                prevBtn.disabled = currentPage === 1;
+                prevBtn.addEventListener('click', function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderTracksTable();
+                    }
+                });
+                pagination.appendChild(prevBtn);
+                
+                // Номера страниц
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                
+                if (endPage - startPage + 1 < maxVisiblePages) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+                
+                if (startPage > 1) {
+                    const firstBtn = document.createElement('button');
+                    firstBtn.className = 'pagination-btn';
+                    firstBtn.textContent = '1';
+                    firstBtn.addEventListener('click', function() {
+                        currentPage = 1;
+                        renderTracksTable();
+                    });
+                    pagination.appendChild(firstBtn);
+                    
+                    if (startPage > 2) {
+                        const dots = document.createElement('span');
+                        dots.className = 'pagination-dots';
+                        dots.textContent = '...';
+                        pagination.appendChild(dots);
+                    }
+                }
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = 'pagination-btn';
+                    if (i === currentPage) pageBtn.classList.add('active');
+                    pageBtn.textContent = i;
+                    pageBtn.addEventListener('click', function() {
+                        currentPage = i;
+                        renderTracksTable();
+                    });
+                    pagination.appendChild(pageBtn);
+                }
+                
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        const dots = document.createElement('span');
+                        dots.className = 'pagination-dots';
+                        dots.textContent = '...';
+                        pagination.appendChild(dots);
+                    }
+                    
+                    const lastBtn = document.createElement('button');
+                    lastBtn.className = 'pagination-btn';
+                    lastBtn.textContent = totalPages;
+                    lastBtn.addEventListener('click', function() {
+                        currentPage = totalPages;
+                        renderTracksTable();
+                    });
+                    pagination.appendChild(lastBtn);
+                }
+                
+                // Кнопка "Вперед"
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'pagination-btn';
+                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                nextBtn.disabled = currentPage === totalPages;
+                nextBtn.addEventListener('click', function() {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderTracksTable();
+                    }
+                });
+                pagination.appendChild(nextBtn);
+            }
+            
+            // Функция добавления обработчиков событий для таблицы
+            function addTableEventListeners() {
+                // Просмотр деталей
+                document.querySelectorAll('.view-details-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const trackId = parseInt(this.getAttribute('data-track-id'));
+                        showTrackDetails(trackId);
+                    });
+                });
+                
+                // Редактирование отклоненного трека
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const trackId = parseInt(this.getAttribute('data-track-id'));
+                        const track = tracksData.find(t => t.id === trackId);
+                        
+                        if (track && confirm(`Редактировать трек "${track.name}" и отправить на повторную модерацию?`)) {
+                            showNotification(`Трек "${track.name}" подготовлен для редактирования`, 'info');
+                            // Здесь можно открыть редактор трека
+                        }
+                    });
+                });
+                
+                // Отмена отправки
+                document.querySelectorAll('.cancel-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const trackId = parseInt(this.getAttribute('data-track-id'));
+                        const track = tracksData.find(t => t.id === trackId);
+                        
+                        if (track && confirm(`Отменить отправку трека "${track.name}" на модерацию?`)) {
+                            // В реальном приложении здесь был бы запрос к API
+                            track.status = "draft";
+                            renderTracksTable();
+                            updateStats();
+                            showNotification(`Отправка трека "${track.name}" отменена`, 'success');
+                        }
+                    });
+                });
+                
+                // Клик по строке таблицы
+                document.querySelectorAll('.track-row').forEach(row => {
+                    row.addEventListener('click', function() {
+                        const trackId = parseInt(this.getAttribute('data-track-id'));
+                        showTrackDetails(trackId);
+                    });
+                });
+            }
+            
+            // Функция отображения деталей трека
+            function showTrackDetails(trackId) {
+                const track = tracksData.find(t => t.id === trackId);
+                if (!track) return;
+                
+                const statusInfo = getStatusInfo(track.status);
+                const dateFormatted = formatDate(track.date);
+                const statusDateFormatted = track.statusDate ? formatDate(track.statusDate) : '—';
+                
+                // Получение текста жанра
+                const genreText = getGenreText(track.genre);
+                
+                modalContent.innerHTML = `
+                    <div class="track-details-modal">
+                        <div class="track-image">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="track-details-text">
+                            <div class="track-name">${track.name}</div>
+                            <div class="track-artist">${track.artist} • ${track.album}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <div class="modal-section-title">Информация о треке</div>
+                        <div class="modal-info-grid">
+                            <div class="modal-info-item">
+                                <div class="modal-info-label">Жанр</div>
+                                <div class="modal-info-value">${genreText}</div>
+                            </div>
+                            <div class="modal-info-item">
+                                <div class="modal-info-label">Длительность</div>
+                                <div class="modal-info-value">${track.duration}</div>
+                            </div>
+                            <div class="modal-info-item">
+                                <div class="modal-info-label">Формат</div>
+                                <div class="modal-info-value">${track.format}</div>
+                            </div>
+                            <div class="modal-info-item">
+                                <div class="modal-info-label">Размер</div>
+                                <div class="modal-info-value">${track.size}</div>
+                            </div>
+                            <div class="modal-info-item">
+                                <div class="modal-info-label">Дата загрузки</div>
+                                <div class="modal-info-value">${dateFormatted}</div>
+                            </div>
+                            <div class="modal-info-item">
+                                <div class="modal-info-label">Прослушиваний</div>
+                                <div class="modal-info-value">${track.plays.toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <div class="modal-section-title">Статус модерации</div>
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <div class="status-badge ${statusInfo.class}" style="font-size: 14px;">
+                                <i class="${statusInfo.icon}"></i>
+                                <span>${statusInfo.text}</span>
+                            </div>
+                            <div style="color: var(--text-secondary); font-size: 14px;">
+                                Обновлен: ${statusDateFormatted}
+                            </div>
+                        </div>
+                        
+                        ${track.reviewer ? `
+                            <div class="modal-info-item">
+                                <div class="modal-info-label">Модератор</div>
+                                <div class="modal-info-value">${track.reviewer}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${track.comments ? `
+                        <div class="modal-section">
+                            <div class="modal-section-title">Комментарии модератора</div>
+                            <div class="modal-comments">
+                                <div class="modal-comments-text">${track.comments}</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="modal-actions">
+                        <button class="modal-btn secondary" id="closeModalBtn">Закрыть</button>
+                        ${track.status === 'rejected' ? `
+                            <button class="modal-btn primary" id="reuploadBtn">Редактировать и отправить снова</button>
+                        ` : ''}
+                    </div>
+                `;
+                
+                // Показываем модальное окно
+                detailsModal.classList.add('active');
+                
+                // Обработчики событий для модального окна
+                document.getElementById('closeModalBtn').addEventListener('click', closeDetailsModal);
+                
+                if (track.status === 'rejected') {
+                    document.getElementById('reuploadBtn').addEventListener('click', function() {
+                        closeDetailsModal();
+                        if (confirm(`Редактировать трек "${track.name}" и отправить на повторную модерацию?`)) {
+                            showNotification(`Трек "${track.name}" подготовлен для редактирования`, 'info');
+                        }
+                    });
+                }
+            }
+            
+            // Функция закрытия модального окна
+            function closeDetailsModal() {
+                detailsModal.classList.remove('active');
+            }
+            
+            closeModalBtn.addEventListener('click', closeDetailsModal);
+            detailsModal.addEventListener('click', function(e) {
+                if (e.target === detailsModal) {
+                    closeDetailsModal();
+                }
+            });
+            
+            // Функция обновления статистики
+            function updateStats() {
+                const stats = {
+                    all: tracksData.length,
+                    pending: tracksData.filter(t => t.status === 'pending').length,
+                    inReview: tracksData.filter(t => t.status === 'pending').length,
+                    approved: tracksData.filter(t => t.status === 'approved').length,
+                    rejected: tracksData.filter(t => t.status === 'rejected').length
+                };
+                
+                // Обновляем значения в статистических карточках
+                document.querySelectorAll('.stat-value').forEach((el, index) => {
+                    const values = Object.values(stats);
+                    if (index < values.length) {
+                        el.textContent = values[index];
+                    }
+                });
+            }
+            
+            // Вспомогательные функции
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            }
+            
+            function getStatusInfo(status) {
+                switch (status) {
+                    case 'pending':
+                        return {
+                            text: 'На рассмотрении',
+                            class: 'status-pending',
+                            icon: 'fas fa-clock'
+                        };
+                    case 'approved':
+                        return {
+                            text: 'Одобрен',
+                            class: 'status-approved',
+                            icon: 'fas fa-check'
+                        };
+                    case 'rejected':
+                        return {
+                            text: 'Отклонен',
+                            class: 'status-rejected',
+                            icon: 'fas fa-times'
+                        };
+                    case 'draft':
+                        return {
+                            text: 'Черновик',
+                            class: 'status-draft',
+                            icon: 'fas fa-edit'
+                        };
+                    default:
+                        return {
+                            text: 'Неизвестно',
+                            class: 'status-draft',
+                            icon: 'fas fa-question'
+                        };
+                }
+            }
+            
+            function getGenreText(genre) {
+                const genres = {
+                    'pop': 'Поп-музыка',
+                    'rock': 'Рок',
+                    'hiphop': 'Хип-хоп',
+                    'electronic': 'Электроника',
+                    'indie': 'Инди'
+                };
+                return genres[genre] || genre;
+            }
+            
+            function showNotification(message, type = 'success') {
+                notificationText.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Навигация
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const page = this.querySelector('.nav-label').textContent;
+                    console.log(`Переход на страницу: ${page}`);
+                });
+            });
+            
+            // Кнопка "Обновить"
+            document.querySelector('.fa-sync-alt').closest('.action-btn').addEventListener('click', function() {
+                showNotification('Статусы треков обновлены', 'success');
+                // В реальном приложении здесь был бы запрос к API
+                renderTracksTable();
+            });
+        });
+    </script>
+</body>
+</html>

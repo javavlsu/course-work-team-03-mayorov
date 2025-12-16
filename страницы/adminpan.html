@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель - Музыкальный стриминговый сервис</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #181818;
+            --card-bg: #1e1e1e;
+            --hover-bg: #282828;
+            --accent: #ffdb4d;
+            --accent-hover: #ffcc00;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --success: #1db954;
+            --warning: #ff9800;
+            --danger: #e22134;
+            --info: #2196f3;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+			background-image: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Боковая навигация */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--secondary-bg);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar .menu-text {
+                display: none;
+            }
+            
+            .sidebar .logo-text {
+                display: none;
+            }
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .logo i {
+            font-size: 24px;
+        }
+        
+        .logo-text {
+            margin-left: 10px;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-section {
+            margin-bottom: 25px;
+        }
+        
+        .menu-title {
+            padding: 0 20px 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item:hover {
+            background-color: var(--hover-bg);
+            color: var(--text-primary);
+        }
+        
+        .menu-item.active {
+            background-color: rgba(255, 219, 77, 0.1);
+            color: var(--accent);
+            border-left-color: var(--accent);
+        }
+        
+        .menu-icon {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .menu-text {
+            flex: 1;
+        }
+        
+        .menu-badge {
+            background-color: var(--danger);
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-details {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .user-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Основной контент */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+        
+        .top-bar {
+            background-color: var(--secondary-bg);
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .top-bar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .admin-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .search-bar {
+            position: relative;
+        }
+        
+        .search-bar input {
+            padding: 8px 15px 8px 35px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-primary);
+            width: 200px;
+            outline: none;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        
+        .notification-btn {
+            position: relative;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            background-color: var(--danger);
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Дашборд */
+        .dashboard-content {
+            padding: 30px 0;
+        }
+        
+        /* Статистика */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .stat-icon.users {
+            background-color: rgba(33, 150, 243, 0.2);
+            color: var(--info);
+        }
+        
+        .stat-icon.music {
+            background-color: rgba(29, 185, 84, 0.2);
+            color: var(--success);
+        }
+        
+        .stat-icon.revenue {
+            background-color: rgba(255, 219, 77, 0.2);
+            color: var(--accent);
+        }
+        
+        .stat-icon.active {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+        
+        .stat-info {
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .stat-change {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .stat-change.positive {
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--danger);
+        }
+        
+        /* Графики и диаграммы */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 992px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .chart-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+        
+        /* Таблицы */
+        .tables-section {
+            margin-top: 30px;
+        }
+        
+        .table-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .table-btn {
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .table-btn.primary {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        .table-btn.primary:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .table-btn.secondary {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+        
+        .table-btn.secondary:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .admin-table th {
+            text-align: left;
+            padding: 12px 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+        
+        .admin-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .admin-table tr:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .admin-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-badge.pending {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+        
+        .status-badge.approved {
+            background-color: rgba(29, 185, 84, 0.2);
+            color: var(--success);
+        }
+        
+        .status-badge.rejected {
+            background-color: rgba(226, 33, 52, 0.2);
+            color: var(--danger);
+        }
+        
+        .status-badge.active {
+            background-color: rgba(29, 185, 84, 0.2);
+            color: var(--success);
+        }
+        
+        .status-badge.inactive {
+            background-color: rgba(158, 158, 158, 0.2);
+            color: var(--text-muted);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .action-btn.edit:hover {
+            color: var(--info);
+        }
+        
+        .action-btn.delete:hover {
+            color: var(--danger);
+        }
+        
+        .action-btn.view:hover {
+            color: var(--accent);
+        }
+        
+        /* Панель модерации */
+        .moderation-panel {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .track-preview {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+        }
+        
+        .track-info {
+            flex: 1;
+        }
+        
+        .track-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .track-meta {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .track-uploader {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        .play-btn-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .moderation-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .moderation-btn {
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .moderation-btn.approve {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .moderation-btn.reject {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .rejection-reason {
+            margin-top: 20px;
+        }
+        
+        .reason-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .reason-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .reason-option input {
+            accent-color: var(--accent);
+        }
+        
+        .custom-reason {
+            margin-top: 15px;
+        }
+        
+        .custom-reason textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            margin-top: 8px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* Формы */
+        .admin-form {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent);
+        }
+        
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23b3b3b3' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        /* Уведомления */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert-success {
+            background-color: rgba(29, 185, 84, 0.2);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+        
+        .alert-warning {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+            border-left: 4px solid var(--warning);
+        }
+        
+        .alert-error {
+            background-color: rgba(226, 33, 52, 0.2);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+        
+        /* Загрузка файлов */
+        .file-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--accent);
+        }
+        
+        .file-upload i {
+            font-size: 48px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        .file-upload p {
+            margin-bottom: 10px;
+        }
+        
+        .file-upload small {
+            color: var(--text-muted);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-table {
+                font-size: 14px;
+            }
+            
+            .admin-table th,
+            .admin-table td {
+                padding: 10px 8px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .moderation-actions {
+                flex-direction: column;
+            }
+            
+            .search-bar input {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Боковая панель -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-crown"></i>
+                    <span class="logo-text">Админ-панель</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-title">Главная</div>
+                    <a href="#" class="menu-item active">
+                        <div class="menu-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <div class="menu-text">Дашборд</div>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-title">Контент</div>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="menu-text">Треки</div>
+                        <div class="menu-badge">5</div>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-compact-disc"></i>
+                        </div>
+                        <div class="menu-text">Альбомы</div>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="menu-text">Исполнители</div>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <div class="menu-text">Плейлисты</div>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-title">Модерация</div>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="menu-text">Модерация треков</div>
+                        <div class="menu-badge">12</div>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-flag"></i>
+                        </div>
+                        <div class="menu-text">Жалобы</div>
+                        <div class="menu-badge">3</div>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-title">Пользователи</div>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="menu-text">Все пользователи</div>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="menu-text">Музыканты</div>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="menu-text">Администраторы</div>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-title">Аналитика</div>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="menu-text">Статистика</div>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <div class="menu-text">Отчеты</div>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-title">Настройки</div>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="menu-text">Настройки системы</div>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="menu-text">Уведомления</div>
+                    </a>
+                </div>
+            </nav>
+
+        </aside>
+        
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Верхняя панель -->
+            <header class="top-bar">
+                <div class="container top-bar-content">
+                    <h1 class="page-title">Дашборд</h1>
+                    
+                    <div class="admin-actions">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Поиск...">
+                        </div>
+                        
+                        <button class="action-btn notification-btn">
+                            <i class="far fa-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        
+                        <button class="action-btn">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            
+                <!-- Таблицы -->
+                <div class="tables-section">
+                    <!-- Треки на модерации -->
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3 class="table-title">Треки на модерации</h3>
+                            <div class="table-actions">
+                                <button class="table-btn primary">Все треки</button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Название трека</th>
+                                        <th>Исполнитель</th>
+                                        <th>Дата загрузки</th>
+                                        <th>Статус</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#2451</td>
+                                        <td>
+                                            <div class="user-cell">
+                                                <div class="user-avatar-small">Т1</div>
+                                                <div>Новый трек 2025</div>
+                                            </div>
+                                        </td>
+                                        <td>MusicMaker123</td>
+                                        <td>15.05.2025</td>
+                                        <td>
+                                            <span class="status-badge pending">На проверке</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn view" title="Просмотр">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn edit" title="Модерировать">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td>#2450</td>
+                                        <td>
+                                            <div class="user-cell">
+                                                <div class="user-avatar-small">Т2</div>
+                                                <div>Летний хит</div>
+                                            </div>
+                                        </td>
+                                        <td>RockStar88</td>
+                                        <td>14.05.2025</td>
+                                        <td>
+                                            <span class="status-badge pending">На проверке</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn view" title="Просмотр">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn edit" title="Модерировать">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td>#2449</td>
+                                        <td>
+                                            <div class="user-cell">
+                                                <div class="user-avatar-small">Т3</div>
+                                                <div>Эпик-трек</div>
+                                            </div>
+                                        </td>
+                                        <td>DJ_Pro</td>
+                                        <td>13.05.2025</td>
+                                        <td>
+                                            <span class="status-badge pending">На проверке</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn view" title="Просмотр">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn edit" title="Модерировать">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // JavaScript для админ-панели
+        document.addEventListener('DOMContentLoaded', function() {
+            // Переключение активного пункта меню
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const pageName = this.querySelector('.menu-text').textContent;
+                    document.querySelector('.page-title').textContent = pageName;
+                    console.log(`Переход на страницу: ${pageName}`);
+                });
+            });
+            
+            // Кнопки действий в таблицах
+            const viewButtons = document.querySelectorAll('.action-btn.view');
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const id = row.querySelector('td:first-child').textContent;
+                    const name = row.querySelector('.user-cell div:last-child').textContent;
+                    
+                    console.log(`Просмотр: ${name} (${id})`);
+                    alert(`Просмотр деталей: ${name}\nID: ${id}`);
+                });
+            });
+            
+            const editButtons = document.querySelectorAll('.action-btn.edit');
+            editButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const id = row.querySelector('td:first-child').textContent;
+                    const name = row.querySelector('.user-cell div:last-child').textContent;
+                    
+                    console.log(`Редактирование: ${name} (${id})`);
+                    
+                    // Для треков на модерации
+                    if (this.querySelector('.fa-check-circle')) {
+                        alert(`Модерация трека: ${name}\nID: ${id}\n\nОткрытие панели модерации...`);
+                    } else {
+                        alert(`Редактирование пользователя: ${name}\nID: ${id}`);
+                    }
+                });
+            });
+            
+            // Кнопка выхода
+            const logoutBtn = document.querySelector('.fa-sign-out-alt').closest('.action-btn');
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('Вы действительно хотите выйти из админ-панели?')) {
+                    console.log('Выход из админ-панели');
+                    // Здесь можно добавить логику выхода
+                    alert('Вы вышли из админ-панели');
+                }
+            });
+            
+            // Уведомления
+            const notificationBtn = document.querySelector('.notification-btn');
+            notificationBtn.addEventListener('click', function() {
+                console.log('Показать уведомления');
+                alert('Уведомления:\n1. Новый трек на модерации\n2. Жалоба на контент\n3. Обновление системы доступно');
+            });
+            
+            // Поиск
+            const searchInput = document.querySelector('.search-bar input');
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const query = this.value;
+                    if (query.trim()) {
+                        console.log(`Поиск: ${query}`);
+                        alert(`Результаты поиска для: "${query}"`);
+                    }
+                }
+            });
+            
+            // Фильтры в графиках
+            const chartSelects = document.querySelectorAll('.form-select');
+            chartSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    const chartTitle = this.closest('.chart-header').querySelector('.chart-title').textContent;
+                    const period = this.value;
+                    console.log(`Изменен период для "${chartTitle}": ${period}`);
+                });
+            });
+            
+            // Кнопки действий в заголовках таблиц
+            const tableButtons = document.querySelectorAll('.table-btn');
+            tableButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const isPrimary = this.classList.contains('primary');
+                    const tableTitle = this.closest('.table-header').querySelector('.table-title').textContent;
+                    
+                    if (isPrimary) {
+                        console.log(`Переход ко всем записям: ${tableTitle}`);
+                        alert(`Переход ко всем записям: ${tableTitle}`);
+                    } else {
+                        console.log(`Экспорт/Фильтр: ${tableTitle}`);
+                        alert(`Действие для: ${tableTitle}`);
+                    }
+                });
+            });
+            
+            // Имитация загрузки данных
+            function updateStats() {
+                // Здесь можно добавить обновление статистики с сервера
+                console.log('Обновление статистики...');
+            }
+            
+            // Обновление статистики каждые 30 секунд
+            setInterval(updateStats, 30000);
+            
+            // Адаптивное меню
+            function handleResize() {
+                const sidebar = document.querySelector('.sidebar');
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.add('mobile');
+                } else {
+                    sidebar.classList.remove('mobile');
+                }
+            }
+            
+            window.addEventListener('resize', handleResize);
+            handleResize(); // Инициализация
+        });
+    </script>
+</body>
+</html>
