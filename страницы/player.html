@@ -370,6 +370,7 @@
             align-items: center;
             gap: 10px;
             width: 150px;
+			justify-content: center;
         }
         
         .volume-slider {
@@ -591,17 +592,9 @@
             </div>
             
             <!-- Вторичные элементы управления -->
-            <div class="secondary-controls">
-                <button class="secondary-btn" id="likeBtn">
-                    <i class="fas fa-heart" id="likeIcon"></i>
-                </button>
-                
+            <div class="secondary-controls">               
                 <button class="secondary-btn" id="addToPlaylistBtn">
                     <i class="fas fa-plus"></i>
-                </button>
-                
-                <button class="secondary-btn" id="downloadBtn">
-                    <i class="fas fa-download"></i>
                 </button>
                 
                 <button class="secondary-btn" id="shareBtn">
@@ -611,15 +604,18 @@
                 <button class="secondary-btn" id="queueBtn">
                     <i class="fas fa-list-ul"></i>
                 </button>
+				<div class="volume-control">
+                    <button class="option-btn" id="volumeBtn">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <div class="volume-slider" id="volumeSlider">
+                        <div class="volume-level" id="volumeLevel"></div>
+                    </div>
+                </div>
             </div>
             
             <!-- Действия -->
-            <div class="player-actions">
-                <button class="action-btn like" id="addToFavoritesBtn">
-                    <i class="fas fa-heart"></i>
-                    <span>В любимые</span>
-                </button>
-                
+            <div class="player-actions">             
                 <button class="action-btn" id="addToQueueBtn">
                     <i class="fas fa-plus-circle"></i>
                     <span>В очередь</span>
@@ -634,28 +630,7 @@
                     <i class="fas fa-user"></i>
                     <span>К исполнителю</span>
                 </button>
-            </div>
-            
-            <!-- Дополнительные опции -->
-            <div class="player-options">
-                <button class="option-btn" id="lyricsBtn">
-                    <i class="fas fa-font"></i>
-                    Текст песни
-                </button>
-                
-                <div class="volume-control">
-                    <button class="option-btn" id="volumeBtn">
-                        <i class="fas fa-volume-up"></i>
-                    </button>
-                    <div class="volume-slider" id="volumeSlider">
-                        <div class="volume-level" id="volumeLevel"></div>
-                    </div>
-                </div>
-                
-                <button class="option-btn" id="devicesBtn">
-                    <i class="fas fa-tv"></i>
-                    Устройства
-                </button>
+            </div>            
             </div>
         </div>
     </main>
