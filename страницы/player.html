@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сейчас играет - Музыкальный стриминговый сервис</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #181818;
+            --card-bg: #1e1e1e;
+            --hover-bg: #282828;
+            --accent: #ffdb4d;
+            --accent-hover: #ffcc00;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --success: #1db954;
+            --danger: #e22134;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+			background-image: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Верхняя панель плеера */
+        .player-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+            padding: 20px 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .player-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            transition: background-color 0.2s;
+        }
+        
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .track-title {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .track-name-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .track-artist-header {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .menu-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            transition: background-color 0.2s;
+        }
+        
+        .menu-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Основной контент плеера */
+        .player-main {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 0 150px;
+        }
+        
+        .album-art {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .album-art-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .vinyl-record {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #000;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotate 20s linear infinite;
+            animation-play-state: paused;
+        }
+        
+        .vinyl-record.playing {
+            animation-play-state: running;
+        }
+        
+        @keyframes rotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .vinyl-center {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--accent);
+        }
+        
+        .track-info {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .track-name {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .track-artist {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .track-album {
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+        
+        /* Прогресс-бар */
+        .progress-section {
+            margin-bottom: 40px;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background-color: var(--border-color);
+            border-radius: 2px;
+            margin-bottom: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .progress-filled {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 35%;
+            background-color: var(--accent);
+            border-radius: 2px;
+        }
+        
+        .progress-handle {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .progress-bar:hover .progress-handle {
+            opacity: 1;
+        }
+        
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Элементы управления */
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: background-color 0.2s;
+        }
+        
+        .control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-btn.large {
+            width: 70px;
+            height: 70px;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            box-shadow: 0 10px 30px rgba(255, 219, 77, 0.3);
+        }
+        
+        .control-btn.large:hover {
+            background-color: var(--accent-hover);
+            transform: scale(1.05);
+        }
+        
+        .secondary-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .secondary-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0.2s, background-color 0.2s;
+        }
+        
+        .secondary-btn:hover {
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .secondary-btn.active {
+            color: var(--accent);
+        }
+        
+        /* Очередь и кнопки действий */
+        .player-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: background-color 0.2s;
+        }
+        
+        .action-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .action-btn.like.active {
+            color: var(--accent);
+        }
+        
+        /* Дополнительные опции */
+        .player-options {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .option-btn {
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+        
+        .option-btn:hover {
+            color: var(--text-primary);
+        }
+        
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 150px;
+			justify-content: center;
+        }
+        
+        .volume-slider {
+            flex: 1;
+            height: 4px;
+            background-color: var(--border-color);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .volume-level {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 70%;
+            background-color: var(--accent);
+            border-radius: 2px;
+        }
+        
+        /* Рекомендации */
+        .recommendations {
+            padding: 20px 0 100px;
+        }
+        
+        .recommendations-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .recommendations-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .recommendations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .recommendation-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        
+        .recommendation-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .recommendation-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            background-color: #333;
+            margin-right: 15px;
+        }
+        
+        .recommendation-info {
+            flex: 1;
+        }
+        
+        .recommendation-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .recommendation-artist {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .recommendation-duration {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .album-art {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .track-name {
+                font-size: 24px;
+            }
+            
+            .track-artist {
+                font-size: 18px;
+            }
+            
+            .player-controls {
+                gap: 20px;
+            }
+            
+            .control-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .control-btn.large {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .album-art {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .track-name {
+                font-size: 20px;
+            }
+            
+            .track-artist {
+                font-size: 16px;
+            }
+            
+            .player-controls {
+                gap: 15px;
+            }
+            
+            .secondary-controls {
+                gap: 20px;
+            }
+            
+            .player-actions {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .action-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя панель плеера -->
+    <header class="player-header">
+        <div class="container player-header-content">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            
+            <div class="track-title">
+                <div class="track-name-header">Любимый трек 1</div>
+                <div class="track-artist-header">Исполнитель 1</div>
+            </div>
+            
+            <button class="menu-btn">
+                <i class="fas fa-ellipsis-h"></i>
+            </button>
+        </div>
+    </header>
+    
+    <!-- Основной контент плеера -->
+    <main class="player-main">
+        <div class="container">
+            <!-- Обложка альбома -->
+            <div class="album-art">
+                <div class="vinyl-record" id="vinylRecord">
+                    <div class="vinyl-center"></div>
+                </div>
+            </div>
+            
+            <!-- Информация о треке -->
+            <div class="track-info">
+                <h1 class="track-name">Любимый трек 1</h1>
+                <p class="track-artist">Исполнитель 1</p>
+                <p class="track-album">Альбом "Лучшие хиты"</p>
+            </div>
+            
+            <!-- Прогресс-бар -->
+            <div class="progress-section">
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-filled" id="progressFilled"></div>
+                    <div class="progress-handle" id="progressHandle"></div>
+                </div>
+                <div class="time-info">
+                    <span class="time-current" id="timeCurrent">1:23</span>
+                    <span class="time-total" id="timeTotal">3:45</span>
+                </div>
+            </div>
+            
+            <!-- Основные элементы управления -->
+            <div class="player-controls">
+                <button class="control-btn" id="shuffleBtn">
+                    <i class="fas fa-random"></i>
+                </button>
+                
+                <button class="control-btn" id="prevBtn">
+                    <i class="fas fa-step-backward"></i>
+                </button>
+                
+                <button class="control-btn large" id="playPauseBtn">
+                    <i class="fas fa-pause" id="playPauseIcon"></i>
+                </button>
+                
+                <button class="control-btn" id="nextBtn">
+                    <i class="fas fa-step-forward"></i>
+                </button>
+                
+                <button class="control-btn" id="repeatBtn">
+                    <i class="fas fa-redo"></i>
+                </button>
+            </div>
+            
+            <!-- Вторичные элементы управления -->
+            <div class="secondary-controls">               
+                <button class="secondary-btn" id="addToPlaylistBtn">
+                    <i class="fas fa-plus"></i>
+                </button>
+                
+                <button class="secondary-btn" id="shareBtn">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+                
+                <button class="secondary-btn" id="queueBtn">
+                    <i class="fas fa-list-ul"></i>
+                </button>
+				<div class="volume-control">
+                    <button class="option-btn" id="volumeBtn">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <div class="volume-slider" id="volumeSlider">
+                        <div class="volume-level" id="volumeLevel"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Действия -->
+            <div class="player-actions">             
+                <button class="action-btn" id="addToQueueBtn">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>В очередь</span>
+                </button>
+                
+                <button class="action-btn" id="viewAlbumBtn">
+                    <i class="fas fa-compact-disc"></i>
+                    <span>К альбому</span>
+                </button>
+                
+                <button class="action-btn" id="viewArtistBtn">
+                    <i class="fas fa-user"></i>
+                    <span>К исполнителю</span>
+                </button>
+            </div>            
+            </div>
+        </div>
+    </main>
+    
+    <!-- Рекомендации -->
+    <section class="recommendations">
+        <div class="container">
+            <div class="recommendations-header">
+                <h2 class="recommendations-title">Рекомендации к треку</h2>
+                <button class="see-all" style="color: var(--text-secondary); font-size: 14px;">Все</button>
+            </div>
+            
+            <div class="recommendations-list">
+                <div class="recommendation-item">
+                    <div class="recommendation-image"></div>
+                    <div class="recommendation-info">
+                        <div class="recommendation-name">Похожий трек 1</div>
+                        <div class="recommendation-artist">Исполнитель 2</div>
+                    </div>
+                    <div class="recommendation-duration">3:22</div>
+                </div>
+                
+                <div class="recommendation-item">
+                    <div class="recommendation-image"></div>
+                    <div class="recommendation-info">
+                        <div class="recommendation-name">Похожий трек 2</div>
+                        <div class="recommendation-artist">Исполнитель 3</div>
+                    </div>
+                    <div class="recommendation-duration">4:15</div>
+                </div>
+                
+                <div class="recommendation-item">
+                    <div class="recommendation-image"></div>
+                    <div class="recommendation-info">
+                        <div class="recommendation-name">Похожий трек 3</div>
+                        <div class="recommendation-artist">Исполнитель 1</div>
+                    </div>
+                    <div class="recommendation-duration">3:45</div>
+                </div>
+                
+                <div class="recommendation-item">
+                    <div class="recommendation-image"></div>
+                    <div class="recommendation-info">
+                        <div class="recommendation-name">Похожий трек 4</div>
+                        <div class="recommendation-artist">Исполнитель 4</div>
+                    </div>
+                    <div class="recommendation-duration">5:01</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script>
+        // JavaScript для полноэкранного плеера
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы управления
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const playPauseIcon = document.getElementById('playPauseIcon');
+            const vinylRecord = document.getElementById('vinylRecord');
+            const likeBtn = document.getElementById('likeBtn');
+            const likeIcon = document.getElementById('likeIcon');
+            const shuffleBtn = document.getElementById('shuffleBtn');
+            const repeatBtn = document.getElementById('repeatBtn');
+            const backBtn = document.getElementById('backBtn');
+            
+            // Прогресс-бар
+            const progressBar = document.getElementById('progressBar');
+            const progressFilled = document.getElementById('progressFilled');
+            const progressHandle = document.getElementById('progressHandle');
+            const timeCurrent = document.getElementById('timeCurrent');
+            const timeTotal = document.getElementById('timeTotal');
+            
+            // Громкость
+            const volumeSlider = document.getElementById('volumeSlider');
+            const volumeLevel = document.getElementById('volumeLevel');
+            const volumeBtn = document.getElementById('volumeBtn');
+            
+            // Состояние плеера
+            let isPlaying = true;
+            let isLiked = true;
+            let isShuffled = false;
+            let isRepeated = false;
+            let currentTime = 83; // 1:23 в секундах
+            let totalTime = 225; // 3:45 в секундах
+            let volume = 0.7;
+            
+            // Инициализация
+            updateTimeDisplay();
+            volumeLevel.style.width = `${volume * 100}%`;
+            
+            // Кнопка play/pause
+            playPauseBtn.addEventListener('click', function() {
+                if (isPlaying) {
+                    // Пауза
+                    playPauseIcon.classList.remove('fa-pause');
+                    playPauseIcon.classList.add('fa-play');
+                    vinylRecord.classList.remove('playing');
+                    isPlaying = false;
+                } else {
+                    // Воспроизведение
+                    playPauseIcon.classList.remove('fa-play');
+                    playPauseIcon.classList.add('fa-pause');
+                    vinylRecord.classList.add('playing');
+                    isPlaying = true;
+                    
+                    // Симуляция прогресса
+                    simulateProgress();
+                }
+            });
+            
+            // Кнопка лайка
+            likeBtn.addEventListener('click', function() {
+                if (isLiked) {
+                    likeIcon.style.color = '';
+                    isLiked = false;
+                } else {
+                    likeIcon.style.color = 'var(--accent)';
+                    isLiked = true;
+                }
+            });
+            
+            // Кнопка "В любимые" в действиях
+            const addToFavoritesBtn = document.getElementById('addToFavoritesBtn');
+            addToFavoritesBtn.addEventListener('click', function() {
+                if (isLiked) {
+                    likeIcon.style.color = '';
+                    addToFavoritesBtn.querySelector('i').style.color = '';
+                    isLiked = false;
+                } else {
+                    likeIcon.style.color = 'var(--accent)';
+                    addToFavoritesBtn.querySelector('i').style.color = 'var(--accent)';
+                    isLiked = true;
+                }
+            });
+            
+            // Кнопка перемешивания
+            shuffleBtn.addEventListener('click', function() {
+                if (isShuffled) {
+                    shuffleBtn.style.color = '';
+                    isShuffled = false;
+                } else {
+                    shuffleBtn.style.color = 'var(--accent)';
+                    isShuffled = true;
+                }
+            });
+            
+            // Кнопка повтора
+            repeatBtn.addEventListener('click', function() {
+                if (isRepeated) {
+                    repeatBtn.style.color = '';
+                    isRepeated = false;
+                } else {
+                    repeatBtn.style.color = 'var(--accent)';
+                    isRepeated = true;
+                }
+            });
+            
+            // Прогресс-бар
+            progressBar.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const percent = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+                
+                progressFilled.style.width = `${percent * 100}%`;
+                progressHandle.style.left = `${percent * 100}%`;
+                
+                currentTime = Math.floor(totalTime * percent);
+                updateTimeDisplay();
+            });
+            
+            // Обновление отображения времени
+            function updateTimeDisplay() {
+                const currentMinutes = Math.floor(currentTime / 60);
+                const currentSeconds = currentTime % 60;
+                timeCurrent.textContent = `${currentMinutes}:${currentSeconds.toString().padStart(2, '0')}`;
+                
+                const totalMinutes = Math.floor(totalTime / 60);
+                const totalSeconds = totalTime % 60;
+                timeTotal.textContent = `${totalMinutes}:${totalSeconds.toString().padStart(2, '0')}`;
+            }
+            
+            // Симуляция прогресса воспроизведения
+            function simulateProgress() {
+                if (!isPlaying) return;
+                
+                if (currentTime < totalTime) {
+                    currentTime++;
+                    const percent = (currentTime / totalTime) * 100;
+                    progressFilled.style.width = `${percent}%`;
+                    progressHandle.style.left = `${percent}%`;
+                    updateTimeDisplay();
+                    
+                    setTimeout(simulateProgress, 1000);
+                } else if (isRepeated) {
+                    // Если включен повтор, начинаем заново
+                    currentTime = 0;
+                    progressFilled.style.width = '0%';
+                    progressHandle.style.left = '0%';
+                    updateTimeDisplay();
+                    setTimeout(simulateProgress, 1000);
+                } else {
+                    // Конец трека
+                    isPlaying = false;
+                    playPauseIcon.classList.remove('fa-pause');
+                    playPauseIcon.classList.add('fa-play');
+                    vinylRecord.classList.remove('playing');
+                }
+            }
+            
+            // Начать симуляцию при загрузке
+            simulateProgress();
+            
+            // Громкость
+            volumeSlider.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const percent = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+                
+                volume = percent;
+                volumeLevel.style.width = `${percent * 100}%`;
+                
+                // Обновление иконки громкости
+                updateVolumeIcon();
+            });
+            
+            function updateVolumeIcon() {
+                const volumeIcon = volumeBtn.querySelector('i');
+                if (volume === 0) {
+                    volumeIcon.classList.remove('fa-volume-up', 'fa-volume-down');
+                    volumeIcon.classList.add('fa-volume-mute');
+                } else if (volume < 0.5) {
+                    volumeIcon.classList.remove('fa-volume-up', 'fa-volume-mute');
+                    volumeIcon.classList.add('fa-volume-down');
+                } else {
+                    volumeIcon.classList.remove('fa-volume-down', 'fa-volume-mute');
+                    volumeIcon.classList.add('fa-volume-up');
+                }
+            }
+            
+            // Кнопка громкости (мут/размут)
+            volumeBtn.addEventListener('click', function() {
+                if (volume > 0) {
+                    // Сохраняем предыдущую громкость
+                    volumeBtn.dataset.previousVolume = volume;
+                    volume = 0;
+                } else {
+                    // Восстанавливаем предыдущую громкость
+                    volume = parseFloat(volumeBtn.dataset.previousVolume) || 0.7;
+                }
+                
+                volumeLevel.style.width = `${volume * 100}%`;
+                updateVolumeIcon();
+            });
+            
+            // Кнопка "Назад"
+            backBtn.addEventListener('click', function() {
+                console.log('Возврат на предыдущую страницу');
+                // Здесь можно добавить навигацию назад
+                // Для демонстрации просто покажем сообщение
+                alert('Возврат на предыдущую страницу');
+            });
+            
+            // Кнопка добавления в плейлист
+            const addToPlaylistBtn = document.getElementById('addToPlaylistBtn');
+            addToPlaylistBtn.addEventListener('click', function() {
+                console.log('Добавление трека в плейлист');
+                // Здесь можно открыть модальное окно выбора плейлиста
+                alert('Выберите плейлист для добавления трека');
+            });
+            
+            // Кнопка скачивания
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.addEventListener('click', function() {
+                console.log('Скачивание трека');
+                // Здесь можно добавить логику скачивания
+                alert('Трек будет скачан для оффлайн-прослушивания');
+            });
+            
+            // Кнопка "Поделиться"
+            const shareBtn = document.getElementById('shareBtn');
+            shareBtn.addEventListener('click', function() {
+                console.log('Поделиться треком');
+                // Здесь можно добавить функционал шеринга
+                alert('Поделиться треком через соцсети или мессенджеры');
+            });
+            
+            // Кнопка очереди
+            const queueBtn = document.getElementById('queueBtn');
+            queueBtn.addEventListener('click', function() {
+                console.log('Просмотр очереди воспроизведения');
+                // Здесь можно показать очередь треков
+                alert('Показать очередь воспроизведения');
+            });
+            
+            // Другие кнопки действий
+            document.getElementById('addToQueueBtn').addEventListener('click', function() {
+                console.log('Добавление в очередь');
+                alert('Трек добавлен в очередь');
+            });
+            
+            document.getElementById('viewAlbumBtn').addEventListener('click', function() {
+                console.log('Переход к альбому');
+                alert('Переход на страницу альбома');
+            });
+            
+            document.getElementById('viewArtistBtn').addEventListener('click', function() {
+                console.log('Переход к исполнителю');
+                alert('Переход на страницу исполнителя');
+            });
+            
+            document.getElementById('lyricsBtn').addEventListener('click', function() {
+                console.log('Показать текст песни');
+                alert('Текст песни будет отображен здесь');
+            });
+            
+            document.getElementById('devicesBtn').addEventListener('click', function() {
+                console.log('Выбор устройства');
+                alert('Выберите устройство для воспроизведения');
+            });
+            
+            // Кнопки предыдущий/следующий трек
+            document.getElementById('prevBtn').addEventListener('click', function() {
+                console.log('Предыдущий трек');
+                // Здесь можно добавить логику переключения треков
+                alert('Переключение на предыдущий трек');
+            });
+            
+            document.getElementById('nextBtn').addEventListener('click', function() {
+                console.log('Следующий трек');
+                // Здесь можно добавить логику переключения треков
+                alert('Переключение на следующий трек');
+            });
+            
+            // Рекомендации (клик по трекам)
+            const recommendationItems = document.querySelectorAll('.recommendation-item');
+            recommendationItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const trackName = this.querySelector('.recommendation-name').textContent;
+                    const trackArtist = this.querySelector('.recommendation-artist').textContent;
+                    
+                    // Обновляем информацию о текущем треке
+                    document.querySelector('.track-name').textContent = trackName;
+                    document.querySelector('.track-artist').textContent = trackArtist;
+                    document.querySelector('.track-name-header').textContent = trackName;
+                    document.querySelector('.track-artist-header').textContent = trackArtist;
+                    
+                    // Сбрасываем прогресс
+                    currentTime = 0;
+                    progressFilled.style.width = '0%';
+                    progressHandle.style.left = '0%';
+                    
+                    // Убеждаемся, что воспроизведение идет
+                    if (!isPlaying) {
+                        isPlaying = true;
+                        playPauseIcon.classList.remove('fa-play');
+                        playPauseIcon.classList.add('fa-pause');
+                        vinylRecord.classList.add('playing');
+                    }
+                    
+                    // Начинаем симуляцию заново
+                    simulateProgress();
+                    
+                    console.log(`Воспроизведение: ${trackName} - ${trackArtist}`);
+                });
+            });
+            
+            // Кнопка меню (три точки)
+            const menuBtn = document.querySelector('.menu-btn');
+            menuBtn.addEventListener('click', function() {
+                console.log('Открытие меню трека');
+                // Здесь можно открыть контекстное меню с дополнительными опциями
+                alert('Меню трека: дополнительные опции');
+            });
+            
+            // Закрытие плеера при нажатии Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    console.log('Закрытие плеера (Escape)');
+                    // Здесь можно добавить закрытие плеера
+                }
+            });
+        });
+    </script>
+</body>
+</html>
