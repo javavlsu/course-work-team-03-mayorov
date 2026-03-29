@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль - Музыкальный стриминговый сервис</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #181818;
+            --card-bg: #1e1e1e;
+            --hover-bg: #282828;
+            --accent: #ffdb4d;
+            --accent-hover: #ffcc00;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --success: #1db954;
+            --danger: #e22134;
+            --premium: #f8c300;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+			background-image: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Навигационная панель */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .logo i {
+            margin-right: 8px;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nav-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0.2s, background-color 0.2s;
+        }
+        
+        .nav-action-btn:hover {
+            color: var(--text-primary);
+            background-color: var(--hover-bg);
+        }
+        
+        /* Заголовок профиля */
+        .profile-header {
+            padding-top: 70px;
+            padding-bottom: 30px;
+            background: linear-gradient(to bottom, #1a1a1a, #121212);
+        }
+        
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin-bottom: 20px;
+            position: relative;
+            border: 4px solid var(--accent);
+        }
+        
+        .edit-avatar-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .profile-name {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .profile-email {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Основной контент */
+        .main-content {
+            padding-bottom: 80px;
+        }
+        
+        /* Подписка */
+        .subscription-section {
+            margin: 30px 0;
+        }
+        
+        .subscription-card {
+            background: linear-gradient(135deg, #f8c300 0%, #ffdb4d 100%);
+            border-radius: 12px;
+            padding: 25px;
+            color: #000;
+            margin-bottom: 20px;
+        }
+        
+        .subscription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .subscription-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        
+        .subscription-badge {
+            background-color: #000;
+            color: var(--accent);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .subscription-desc {
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+        
+        .subscription-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        .feature-item i {
+            color: #000;
+        }
+        
+        .manage-subscription-btn {
+            background-color: #000;
+            color: var(--accent);
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .manage-subscription-btn:hover {
+            background-color: #222;
+        }
+        
+        /* Настройки */
+        .settings-section {
+            margin: 40px 0;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .settings-list {
+            background-color: var(--secondary-bg);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        
+        .settings-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-item-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .settings-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+        }
+        
+        .settings-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .settings-title {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .settings-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .settings-arrow {
+            color: var(--text-secondary);
+        }
+        
+        /* Любимые треки */
+        .favorites-section {
+            margin: 40px 0;
+        }
+        
+        .track-list {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .track-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 100px 50px;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+        }
+        
+        .track-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .track-number {
+            color: var(--text-secondary);
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .track-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .track-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .track-artist {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .track-duration {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .track-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0.2s, background-color 0.2s;
+        }
+        
+        .action-btn:hover {
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Кнопка выхода */
+        .logout-section {
+            margin: 40px 0;
+            text-align: center;
+        }
+        
+        .logout-btn {
+            background-color: var(--danger);
+            color: white;
+            padding: 12px 40px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.2s;
+        }
+        
+        .logout-btn:hover {
+            background-color: #c21825;
+        }
+        
+        /* Нижняя панель навигации */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--primary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-item.active {
+            color: var(--accent);
+        }
+        
+        .nav-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        .nav-label {
+            font-size: 12px;
+        }
+        
+        /* Мини-плеер */
+        .mini-player {
+            position: fixed;
+            bottom: 70px;
+            left: 0;
+            right: 0;
+            background-color: var(--secondary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 999;
+        }
+        
+        .mini-player-track {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        
+        .mini-player-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background-color: #333;
+        }
+        
+        .mini-player-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .mini-player-track-name {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mini-player-track-artist {
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mini-player-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .mini-control-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: background-color 0.2s;
+        }
+        
+        .mini-control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .mini-play-btn {
+            width: 36px;
+            height: 36px;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        /* Модальное окно редактирования профиля */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background-color: var(--secondary-bg);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: background-color 0.2s;
+        }
+        
+        .modal-close:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .modal-content {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .form-input:focus {
+            border-color: var(--accent);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-cancel {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+        }
+        
+        .btn-cancel:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .btn-save {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        .btn-save:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .subscription-features {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-stats {
+                gap: 20px;
+            }
+            
+            .stat-value {
+                font-size: 20px;
+            }
+            
+            .profile-name {
+                font-size: 24px;
+            }
+            
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .track-item {
+                grid-template-columns: 40px 1fr 80px 40px;
+                padding: 10px 12px;
+            }
+            
+            .profile-stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .stat-item {
+                width: 45%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя навигационная панель -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="#" class="logo">
+                <i class="fas fa-music"></i>
+                MusicStream
+            </a>
+            
+            <div class="nav-actions">
+                <button class="nav-action-btn">
+                    <i class="far fa-bell"></i>
+                </button>
+                <button class="nav-action-btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Заголовок профиля -->
+    <header class="profile-header">
+        <div class="container header-content">
+            <div class="profile-avatar">
+                <span>МС</span>
+            </div>
+            
+            <h1 class="profile-name">Матвей</h1>
+            <p class="profile-email">student@vlsu.ru</p>
+        </div>
+    </header>
+    
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Подписка -->
+            <section class="subscription-section">
+                <div class="subscription-card">
+                    <div class="subscription-header">
+                        <h2 class="subscription-title">Premium Подписка</h2>
+                        <span class="subscription-badge">Активна</span>
+                    </div>
+
+                    <div class="subscription-features">
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Без рекламы</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Высокое качество звука</span>
+                        </div>
+                    </div>
+                    
+                    <button class="manage-subscription-btn">
+                        <i class="fas fa-cog"></i>
+                        Управление подпиской
+                    </button>
+                </div>
+                
+                <p style="color: var(--text-secondary); font-size: 14px; text-align: center;">
+                    Подписка активна до: 31.12.2025
+                </p>
+            </section>
+            <!-- Кнопка выхода -->
+            <section class="logout-section">
+                <button class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Выйти из аккаунта
+                </button>
+            </section>
+        </div>
+    </main>
+    
+    <!-- Мини-плеер -->
+    <div class="mini-player">
+        <div class="mini-player-track">
+            <div class="mini-player-image"></div>
+            <div class="mini-player-info">
+                <div class="mini-player-track-name">Любимый трек 1</div>
+                <div class="mini-player-track-artist">Исполнитель 1</div>
+            </div>
+        </div>
+        
+        <div class="mini-player-controls">
+            <button class="mini-control-btn">
+                <i class="fas fa-heart" style="color: var(--accent);"></i>
+            </button>
+            <button class="mini-control-btn mini-play-btn">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="mini-control-btn">
+                <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Нижняя панель навигации -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <a href="#" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">Главная</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-search nav-icon"></i>
+                <span class="nav-label">Поиск</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-book nav-icon"></i>
+                <span class="nav-label">Библиотека</span>
+            </a>
+            
+            <a href="#" class="nav-item active">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">Профиль</span>
+            </a>
+        </div>
+    </nav>
+    
+    <!-- Модальное окно редактирования профиля -->
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Редактировать профиль</h3>
+                <button class="modal-close" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-content">
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label class="form-label" for="name">Имя</label>
+                        <input type="text" id="name" class="form-input" value="Матвей">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email</label>
+                        <input type="email" id="email" class="form-input" value="student@vlsu.ru">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="username">Имя пользователя</label>
+                        <input type="text" id="username" class="form-input" value="maiorov_music">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="bio">О себе</label>
+                        <textarea id="bio" class="form-input" rows="3" placeholder="Расскажите о себе...">Студент ВлГУ, любитель музыки</textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-cancel" id="cancelEditBtn">Отмена</button>
+                        <button type="submit" class="btn btn-save">Сохранить изменения</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // JavaScript для страницы профиля
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы модального окна
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const editAvatarBtn = document.getElementById('editAvatarBtn');
+            const editProfileModal = document.getElementById('editProfileModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const profileForm = document.getElementById('profileForm');
+            
+            // Открытие модального окна редактирования профиля
+            editProfileBtn.addEventListener('click', function() {
+                editProfileModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            editAvatarBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                editProfileModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Закрытие модального окна
+            function closeModal() {
+                editProfileModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+            
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelEditBtn.addEventListener('click', closeModal);
+            
+            // Закрытие модального окна при клике на оверлей
+            editProfileModal.addEventListener('click', function(e) {
+                if (e.target === editProfileModal) {
+                    closeModal();
+                }
+            });
+            
+            // Обработка формы профиля
+            profileForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const username = document.getElementById('username').value;
+                const bio = document.getElementById('bio').value;
+                
+                // Обновление данных на странице
+                document.querySelector('.profile-name').textContent = name;
+                document.querySelector('.profile-email').textContent = email;
+                
+                // Здесь можно добавить отправку данных на сервер
+                console.log('Сохранение данных профиля:', { name, email, username, bio });
+                
+                // Закрытие модального окна
+                closeModal();
+                
+                // Показ уведомления об успешном сохранении
+                alert('Профиль успешно обновлен!');
+            });
+            
+            // Обработка кнопок лайка
+            const likeButtons = document.querySelectorAll('.action-btn .fa-heart');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // Треки на странице профиля уже лайкнуты
+                    // При клике убираем лайк
+                    if (this.classList.contains('fas')) {
+                        this.classList.remove('fas');
+                        this.classList.add('far');
+                        this.style.color = '';
+                        
+                        // Обновляем счетчик любимых треков
+                        const statValue = document.querySelector('.stat-value');
+                        let currentCount = parseInt(statValue.textContent);
+                        statValue.textContent = (currentCount - 1).toString();
+                    }
+                });
+            });
+            
+            // Воспроизведение трека
+            const trackItems = document.querySelectorAll('.track-item');
+            trackItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.closest('.track-actions')) {
+                        const trackName = this.querySelector('.track-name').textContent;
+                        const trackArtist = this.querySelector('.track-artist').textContent;
+                        
+                        // Обновляем мини-плеер
+                        document.querySelector('.mini-player-track-name').textContent = trackName;
+                        document.querySelector('.mini-player-track-artist').textContent = trackArtist;
+                        
+                        // Меняем иконку play/pause
+                        const playBtn = document.querySelector('.mini-play-btn i');
+                        if (playBtn.classList.contains('fa-play')) {
+                            playBtn.classList.remove('fa-play');
+                            playBtn.classList.add('fa-pause');
+                        }
+                    }
+                });
+            });
+            
+            // Управление мини-плеером
+            const miniPlayBtn = document.querySelector('.mini-play-btn');
+            miniPlayBtn.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('fa-play')) {
+                    icon.classList.remove('fa-play');
+                    icon.classList.add('fa-pause');
+                } else {
+                    icon.classList.remove('fa-pause');
+                    icon.classList.add('fa-play');
+                }
+            });
+            
+            // Лайк в мини-плеере
+            const miniLikeBtn = document.querySelector('.mini-control-btn .fa-heart');
+            miniLikeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (this.classList.contains('fas')) {
+                    this.classList.remove('fas');
+                    this.classList.add('far');
+                    this.style.color = '';
+                } else {
+                    this.classList.remove('far');
+                    this.classList.add('fas');
+                    this.style.color = 'var(--accent)';
+                }
+            });
+            
+            // Навигация
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const page = this.querySelector('.nav-label').textContent;
+                    console.log(`Переход на страницу: ${page}`);
+                });
+            });
+            
+            // Кнопка управления подпиской
+            const manageSubscriptionBtn = document.querySelector('.manage-subscription-btn');
+            manageSubscriptionBtn.addEventListener('click', function() {
+                console.log('Переход к управлению подпиской');
+                // Здесь можно добавить переход на страницу управления подпиской
+            });
+            
+            // Кнопка выхода
+            const logoutBtn = document.querySelector('.logout-btn');
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('Вы действительно хотите выйти из аккаунта?')) {
+                    console.log('Выход из аккаунта');
+                    // Здесь можно добавить логику выхода
+                    alert('Вы вышли из аккаунта');
+                }
+            });
+            
+            // Настройки (клик по пунктам)
+            const settingsItems = document.querySelectorAll('.settings-item');
+            settingsItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const title = this.querySelector('.settings-title').textContent;
+                    console.log(`Открытие настроек: ${title}`);
+                    
+                    // Для разных пунктов настроек можно открывать разные модальные окна
+                    if (title === 'Редактировать профиль') {
+                        // Уже обработано выше
+                        return;
+                    }
+                    
+                    alert(`Открытие настроек: ${title}\n(Здесь будет соответствующий функционал)`);
+                });
+            });
+            
+            // Закрытие модального окна при нажатии Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && editProfileModal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

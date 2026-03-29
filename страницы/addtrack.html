@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузка трека - Музыкальный стриминговый сервис</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #181818;
+            --card-bg: #1e1e1e;
+            --hover-bg: #282828;
+            --accent: #ffdb4d;
+            --accent-hover: #ffcc00;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --success: #1db954;
+            --warning: #ff9800;
+            --danger: #e22134;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+			background-image: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Навигационная панель */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            transition: background-color 0.2s;
+        }
+        
+        .back-btn:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .navbar-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0.2s, background-color 0.2s;
+        }
+        
+        .action-btn:hover {
+            color: var(--text-primary);
+            background-color: var(--hover-bg);
+        }
+        
+        /* Основной контент */
+        .main-content {
+            padding-top: 70px;
+            padding-bottom: 80px;
+        }
+        
+        /* Заголовок */
+        .upload-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .upload-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .upload-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+        
+        /* Форма загрузки */
+        .upload-form {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* Загрузка файла */
+        .file-upload-section {
+            margin-bottom: 40px;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-upload-area:hover {
+            border-color: var(--accent);
+            background-color: rgba(255, 219, 77, 0.05);
+        }
+        
+        .file-upload-area.dragover {
+            border-color: var(--success);
+            background-color: rgba(29, 185, 84, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 64px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .upload-hint {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .browse-btn {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .browse-btn:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        /* Информация о файле */
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .file-info.show {
+            display: block;
+        }
+        
+        .file-details {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .file-name i {
+            color: var(--accent);
+        }
+        
+        .file-size {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Форма информации о треке */
+        .track-info-form {
+            margin-top: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-label.required::after {
+            content: " *";
+            color: var(--danger);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent);
+        }
+        
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23b3b3b3' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 576px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        
+        .form-hint {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .checkbox-input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+        
+        .checkbox-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .checkbox-label a {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+        
+        /* Кнопки формы */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        /* Информация о процессе */
+        .process-info {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .process-info.show {
+            display: block;
+        }
+        
+        .process-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .process-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            right: 30px;
+            height: 2px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+        
+        .process-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+        
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .step-icon.active {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        .step-icon.completed {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .step-label.active {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .process-details {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .process-status {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .process-message {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        /* Требования */
+        .requirements {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .requirements-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .requirements-list {
+            list-style-type: none;
+        }
+        
+        .requirements-list li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .requirements-list i {
+            color: var(--success);
+            margin-top: 2px;
+        }
+        
+        /* Нижняя панель навигации */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--primary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-item.active {
+            color: var(--accent);
+        }
+        
+        .nav-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        .nav-label {
+            font-size: 12px;
+        }
+        
+        /* Мини-плеер */
+        .mini-player {
+            position: fixed;
+            bottom: 70px;
+            left: 0;
+            right: 0;
+            background-color: var(--secondary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 999;
+        }
+        
+        .mini-player-track {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        
+        .mini-player-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background-color: #333;
+        }
+        
+        .mini-player-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .mini-player-track-name {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mini-player-track-artist {
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mini-player-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .mini-control-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: background-color 0.2s;
+        }
+        
+        .mini-control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .mini-play-btn {
+            width: 36px;
+            height: 36px;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .upload-title {
+                font-size: 24px;
+            }
+            
+            .upload-form {
+                padding: 20px;
+            }
+            
+            .process-steps {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .process-steps::before {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя навигационная панель -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <div class="navbar-title">Загрузка трека</div>
+            
+            <div class="user-actions">
+                <button class="action-btn">
+                    <i class="far fa-question-circle"></i>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-user"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Заголовок -->
+            <header class="upload-header">
+                <h1 class="upload-title">Загрузите свой трек</h1>
+                <p class="upload-subtitle">Поделитесь своей музыкой с миром</p>
+            </header>
+            
+            <!-- Форма загрузки -->
+            <div class="upload-form" id="uploadForm">
+                <!-- Загрузка файла -->
+                <section class="file-upload-section">
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">Перетащите аудиофайл сюда</div>
+                        <div class="upload-hint">или</div>
+                        <div class="browse-btn">
+                            <i class="fas fa-folder-open"></i>
+                            Выберите файл
+                        </div>
+                        <input type="file" id="audioFile" class="file-input" accept=".mp3,.wav,.flac,.aac,.m4a">
+                    </div>
+                    
+                    <div class="file-info" id="fileInfo">
+                        <div class="file-details">
+                            <div class="file-name">
+                                <i class="fas fa-music"></i>
+                                <span id="fileName">track.mp3</span>
+                            </div>
+                            <div class="file-size" id="fileSize">0 MB</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">Загрузка...</div>
+                    </div>
+                </section>
+                
+                <!-- Информация о треке -->
+                <section class="track-info-form">
+                    <h2 class="section-title">Информация о треке</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label required" for="trackTitle">Название трека</label>
+                        <input type="text" id="trackTitle" class="form-control" placeholder="Введите название трека">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required" for="artistName">Исполнитель</label>
+                            <input type="text" id="artistName" class="form-control" value="Ваше имя исполнителя" readonly>
+                            <div class="form-hint">На основе вашего профиля</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label required" for="trackGenre">Жанр</label>
+                            <select id="trackGenre" class="form-control form-select">
+                                <option value="" disabled selected>Выберите жанр</option>
+                                <option value="pop">Поп-музыка</option>
+                                <option value="rock">Рок</option>
+                                <option value="hiphop">Хип-хоп</option>
+                                <option value="electronic">Электронная музыка</option>
+                                <option value="jazz">Джаз</option>
+                                <option value="classical">Классика</option>
+                                <option value="folk">Фолк</option>
+                                <option value="rnb">R&B</option>
+                                <option value="metal">Метал</option>
+                                <option value="other">Другое</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="trackAlbum">Альбом</label>
+                            <select id="trackAlbum" class="form-control form-select">
+                                <option value="" selected>Без альбома (сингл)</option>
+                                <option value="new">+ Создать новый альбом</option>
+                                <option value="album1">Мой первый альбом</option>
+                                <option value="album2">Летние хиты</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="releaseYear">Год выпуска</label>
+                            <input type="number" id="releaseYear" class="form-control" min="1900" max="2024" value="2024">
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="copyrightConfirm" class="checkbox-input" required>
+                        <label for="copyrightConfirm" class="checkbox-label">
+                            Я подтверждаю, что являюсь автором этой композиции или имею право на её публикацию. 
+                            <a href="#">Условия использования</a>
+                        </label>
+                    </div>
+                </section>
+                
+                <!-- Требования -->
+                <div class="requirements">
+                    <h3 class="requirements-title">Требования к файлам</h3>
+                    <ul class="requirements-list">
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Поддерживаемые форматы: MP3, WAV, FLAC, AAC, M4A</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Максимальный размер файла: 500 MB</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Рекомендуемое качество: 192 kbps или выше</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>Файл не должен содержать защиту от копирования (DRM)</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Кнопки формы -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">
+                        Отмена
+                    </button>
+                    <button type="button" class="btn btn-primary" id="uploadBtn" disabled>
+                        <i class="fas fa-upload"></i>
+                        Загрузить трек
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Информация о процессе -->
+            <div class="process-info" id="processInfo">
+                <div class="process-steps">
+                    <div class="process-step">
+                        <div class="step-icon completed" id="step1Icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="step-label active">Загрузка файла</div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <div class="step-icon active" id="step2Icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="step-label active">Обработка</div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <div class="step-icon" id="step3Icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="step-label">Модерация</div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <div class="step-icon" id="step4Icon">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="step-label">Опубликовано</div>
+                    </div>
+                </div>
+                
+                <div class="process-details">
+                    <div class="process-status" id="processStatus">Обработка аудиофайла...</div>
+                    <div class="process-message" id="processMessage">Извлечение метаданных и анализ качества звука</div>
+                    
+                    <div class="progress-bar" style="max-width: 400px; margin: 20px auto;">
+                        <div class="progress-fill" id="processProgress" style="width: 60%;"></div>
+                    </div>
+                    <div class="progress-text" id="processProgressText">60% завершено</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Мини-плеер -->
+    <div class="mini-player">
+        <div class="mini-player-track">
+            <div class="mini-player-image"></div>
+            <div class="mini-player-info">
+                <div class="mini-player-track-name">Мой последний трек</div>
+                <div class="mini-player-track-artist">Ваше имя</div>
+            </div>
+        </div>
+        
+        <div class="mini-player-controls">
+            <button class="mini-control-btn">
+                <i class="far fa-heart"></i>
+            </button>
+            <button class="mini-control-btn mini-play-btn">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="mini-control-btn">
+                <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Нижняя панель навигации -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <a href="#" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">Главная</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-search nav-icon"></i>
+                <span class="nav-label">Поиск</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-book nav-icon"></i>
+                <span class="nav-label">Библиотека</span>
+            </a>
+            
+            <a href="#" class="nav-item active">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">Профиль</span>
+            </a>
+        </div>
+    </nav>
+    
+    <script>
+        // JavaScript для страницы загрузки трека
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы
+            const backBtn = document.getElementById('backBtn');
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            const audioFileInput = document.getElementById('audioFile');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const uploadForm = document.getElementById('uploadForm');
+            const processInfo = document.getElementById('processInfo');
+            const trackTitle = document.getElementById('trackTitle');
+            const copyrightConfirm = document.getElementById('copyrightConfirm');
+            
+            // Элементы процесса
+            const step1Icon = document.getElementById('step1Icon');
+            const step2Icon = document.getElementById('step2Icon');
+            const step3Icon = document.getElementById('step3Icon');
+            const step4Icon = document.getElementById('step4Icon');
+            const processStatus = document.getElementById('processStatus');
+            const processMessage = document.getElementById('processMessage');
+            const processProgress = document.getElementById('processProgress');
+            const processProgressText = document.getElementById('processProgressText');
+            
+            // Состояние
+            let isFileUploaded = false;
+            let isUploading = false;
+            let uploadProgress = 0;
+            
+            // Валидация формы
+            function validateForm() {
+                const titleValid = trackTitle.value.trim().length > 0;
+                const genreValid = document.getElementById('trackGenre').value !== '';
+                const copyrightValid = copyrightConfirm.checked;
+                const fileValid = isFileUploaded;
+                
+                if (titleValid && genreValid && copyrightValid && fileValid) {
+                    uploadBtn.disabled = false;
+                } else {
+                    uploadBtn.disabled = true;
+                }
+            }
+            
+            // Слушатели для валидации
+            trackTitle.addEventListener('input', validateForm);
+            copyrightConfirm.addEventListener('change', validateForm);
+            document.getElementById('trackGenre').addEventListener('change', validateForm);
+            
+            // Клик по области загрузки
+            fileUploadArea.addEventListener('click', function() {
+                audioFileInput.click();
+            });
+            
+            // Выбор файла
+            audioFileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    handleFileSelection(file);
+                }
+            });
+            
+            // Drag & Drop
+            fileUploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+            
+            fileUploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+            });
+            
+            fileUploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('audio/')) {
+                    handleFileSelection(file);
+                } else {
+                    alert('Пожалуйста, выберите аудиофайл');
+                }
+            });
+            
+            // Обработка выбранного файла
+            function handleFileSelection(file) {
+                // Проверка типа файла
+                const validTypes = ['audio/mpeg', 'audio/wav', 'audio/flac', 'audio/aac', 'audio/x-m4a'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Неподдерживаемый формат файла. Пожалуйста, выберите MP3, WAV, FLAC, AAC или M4A файл.');
+                    return;
+                }
+                
+                // Проверка размера файла
+                const maxSize = 500 * 1024 * 1024; // 500 MB
+                if (file.size > maxSize) {
+                    alert('Файл слишком большой. Максимальный размер: 500 MB');
+                    return;
+                }
+                
+                // Обновление информации о файле
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                
+                // Сброс прогресса
+                uploadProgress = 0;
+                progressFill.style.width = '0%';
+                progressText.textContent = 'Готово к загрузке';
+                
+                // Показать информацию о файле
+                fileInfo.classList.add('show');
+                
+                // Имитация загрузки файла
+                simulateFileUpload(file);
+                
+                // Обновить состояние
+                isFileUploaded = true;
+                validateForm();
+            }
+            
+            // Форматирование размера файла
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            // Имитация загрузки файла
+            function simulateFileUpload(file) {
+                if (isUploading) return;
+                
+                isUploading = true;
+                progressText.textContent = 'Загрузка...';
+                
+                // Имитация прогресса загрузки
+                const interval = setInterval(() => {
+                    uploadProgress += Math.random() * 10;
+                    if (uploadProgress >= 100) {
+                        uploadProgress = 100;
+                        clearInterval(interval);
+                        isUploading = false;
+                        progressText.textContent = 'Загрузка завершена';
+                    }
+                    
+                    progressFill.style.width = uploadProgress + '%';
+                    progressText.textContent = `Загрузка... ${Math.round(uploadProgress)}%`;
+                }, 200);
+            }
+            
+            // Загрузка трека
+            uploadBtn.addEventListener('click', function() {
+                if (this.disabled) return;
+                
+                // Собрать данные формы
+                const trackData = {
+                    title: trackTitle.value.trim(),
+                    artist: document.getElementById('artistName').value,
+                    genre: document.getElementById('trackGenre').value,
+                    album: document.getElementById('trackAlbum').value,
+                    year: document.getElementById('releaseYear').value,
+                    description: document.getElementById('trackDescription').value,
+                    fileName: fileName.textContent,
+                    fileSize: fileSize.textContent,
+                    uploadDate: new Date().toISOString()
+                };
+                
+                console.log('Данные трека для загрузки:', trackData);
+                
+                // Переключение на экран процесса
+                uploadForm.style.display = 'none';
+                processInfo.classList.add('show');
+                
+                // Начать процесс обработки
+                startUploadProcess();
+            });
+            
+            // Процесс загрузки и обработки
+            function startUploadProcess() {
+                // Шаг 1 уже завершен (загрузка файла)
+                step1Icon.classList.remove('active');
+                step1Icon.classList.add('completed');
+                
+                // Шаг 2: Обработка (активен)
+                step2Icon.classList.add('active');
+                processStatus.textContent = 'Обработка аудиофайла...';
+                processMessage.textContent = 'Извлечение метаданных и анализ качества звука';
+                
+                // Имитация обработки
+                let processStep = 2;
+                let processProgressValue = 60;
+                
+                const processInterval = setInterval(() => {
+                    processProgressValue += 5;
+                    if (processProgressValue > 100) processProgressValue = 100;
+                    
+                    processProgress.style.width = processProgressValue + '%';
+                    processProgressText.textContent = processProgressValue + '% завершено';
+                    
+                    // Переход к следующему шагу
+                    if (processProgressValue >= 100 && processStep === 2) {
+                        // Завершить шаг 2
+                        step2Icon.classList.remove('active');
+                        step2Icon.classList.add('completed');
+                        
+                        // Начать шаг 3
+                        processStep = 3;
+                        processProgressValue = 0;
+                        step3Icon.classList.add('active');
+                        processStatus.textContent = 'Модерация контента...';
+                        processMessage.textContent = 'Проверка на соответствие правилам платформы';
+                        
+                        // Сбросить прогресс для шага 3
+                        setTimeout(() => {
+                            processProgressValue = 0;
+                        }, 1000);
+                    } else if (processProgressValue >= 100 && processStep === 3) {
+                        // Завершить шаг 3
+                        step3Icon.classList.remove('active');
+                        step3Icon.classList.add('completed');
+                        
+                        // Начать шаг 4
+                        processStep = 4;
+                        processProgressValue = 0;
+                        step4Icon.classList.add('active');
+                        processStatus.textContent = 'Публикация трека...';
+                        processMessage.textContent = 'Трек добавляется в каталог';
+                        
+                        // Сбросить прогресс для шага 4
+                        setTimeout(() => {
+                            processProgressValue = 0;
+                        }, 1000);
+                    } else if (processProgressValue >= 100 && processStep === 4) {
+                        // Завершить весь процесс
+                        clearInterval(processInterval);
+                        step4Icon.classList.remove('active');
+                        step4Icon.classList.add('completed');
+                        
+                        processStatus.textContent = 'Трек успешно загружен!';
+                        processMessage.textContent = 'Ваш трек теперь доступен в каталоге. Он появится в поиске после окончания модерации.';
+                        
+                        // Показать кнопку для перехода
+                        setTimeout(() => {
+                            processInfo.innerHTML = `
+                                <div style="text-align: center; padding: 40px 20px;">
+                                    <div style="font-size: 48px; color: var(--success); margin-bottom: 20px;">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <h2 style="margin-bottom: 10px;">Трек успешно загружен!</h2>
+                                    <p style="color: var(--text-secondary); margin-bottom: 30px;">
+                                        Ваш трек "${trackTitle.value.trim()}" был загружен и отправлен на модерацию.
+                                        Обычно модерация занимает 1-3 рабочих дня.
+                                    </p>
+                                    <div style="display: flex; gap: 15px; justify-content: center;">
+                                        <button class="btn btn-secondary" id="viewTrackBtn">
+                                            Просмотреть трек
+                                        </button>
+                                        <button class="btn btn-primary" id="uploadAnotherBtn">
+                                            Загрузить ещё один
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Добавить обработчики для новых кнопок
+                            document.getElementById('viewTrackBtn').addEventListener('click', function() {
+                                console.log('Переход к загруженному треку');
+                                alert('Переход на страницу трека');
+                            });
+                            
+                            document.getElementById('uploadAnotherBtn').addEventListener('click', function() {
+                                location.reload(); // Перезагрузить страницу для новой загрузки
+                            });
+                        }, 2000);
+                    }
+                }, 500);
+            }
+            
+            // Кнопка "Отмена"
+            cancelBtn.addEventListener('click', function() {
+                if (isUploading) {
+                    if (confirm('Загрузка файла в процессе. Прервать загрузку?')) {
+                        console.log('Загрузка отменена');
+                        // Здесь можно остановить реальную загрузку
+                        resetForm();
+                    }
+                } else if (isFileUploaded || trackTitle.value.trim().length > 0) {
+                    if (confirm('У вас есть несохраненные данные. Выйти без сохранения?')) {
+                        console.log('Выход без сохранения');
+                        // window.history.back();
+                        resetForm();
+                    }
+                } else {
+                    console.log('Возврат на предыдущую страницу');
+                    // window.history.back();
+                }
+            });
+            
+            // Кнопка "Назад"
+            backBtn.addEventListener('click', function() {
+                cancelBtn.click();
+            });
+            
+            // Сброс формы
+            function resetForm() {
+                isFileUploaded = false;
+                isUploading = false;
+                uploadProgress = 0;
+                
+                fileInfo.classList.remove('show');
+                audioFileInput.value = '';
+                trackTitle.value = '';
+                document.getElementById('trackGenre').value = '';
+                document.getElementById('trackDescription').value = '';
+                copyrightConfirm.checked = false;
+                
+                validateForm();
+            }
+            
+            // Выбор "Создать новый альбом"
+            const trackAlbumSelect = document.getElementById('trackAlbum');
+            trackAlbumSelect.addEventListener('change', function() {
+                if (this.value === 'new') {
+                    const albumName = prompt('Введите название нового альбома:');
+                    if (albumName && albumName.trim().length > 0) {
+                        // Добавить новый вариант в select
+                        const newOption = document.createElement('option');
+                        newOption.value = albumName.toLowerCase().replace(/\s+/g, '_');
+                        newOption.textContent = albumName;
+                        trackAlbumSelect.insertBefore(newOption, trackAlbumSelect.options[1]);
+                        trackAlbumSelect.value = newOption.value;
+                    } else {
+                        this.value = '';
+                    }
+                }
+            });
+            
+            // Управление мини-плеером
+            const miniPlayBtn = document.querySelector('.mini-play-btn');
+            miniPlayBtn.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('fa-play')) {
+                    icon.classList.remove('fa-play');
+                    icon.classList.add('fa-pause');
+                } else {
+                    icon.classList.remove('fa-pause');
+                    icon.classList.add('fa-play');
+                }
+            });
+            
+            // Навигация
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const page = this.querySelector('.nav-label').textContent;
+                    console.log(`Переход на страницу: ${page}`);
+                });
+            });
+            
+            // Кнопки помощи и профиля
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const icon = this.querySelector('i').className;
+                    
+                    if (icon.includes('question-circle')) {
+                        console.log('Открыть справку');
+                        alert('Справка по загрузке треков:\n\n1. Выберите аудиофайл\n2. Заполните информацию о треке\n3. Подтвердите авторские права\n4. Нажмите "Загрузить трек"');
+                    } else if (icon.includes('user')) {
+                        console.log('Переход в профиль');
+                        alert('Переход в профиль музыканта');
+                    }
+                });
+            });
+            
+            // Инициализация
+            validateForm();
+        });
+    </script>
+</body>
+</html>

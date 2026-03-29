@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя музыка - Музыкальный стриминговый сервис</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #181818;
+            --card-bg: #1e1e1e;
+            --hover-bg: #282828;
+            --accent: #ffdb4d;
+            --accent-hover: #ffcc00;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --success: #1db954;
+            --danger: #e22134;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+			background-image: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Навигационная панель */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .logo i {
+            margin-right: 8px;
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .notification-btn, .settings-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--secondary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        
+        .notification-btn:hover, .settings-btn:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        /* Заголовок библиотеки */
+        .library-header {
+            padding-top: 70px;
+            padding-bottom: 20px;
+            background: linear-gradient(to bottom, #1a1a1a, #121212);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .library-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .library-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .create-playlist-btn {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .create-playlist-btn:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        /* Табы навигации */
+        .library-tabs {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        
+        .library-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .library-tabs::-webkit-scrollbar-track {
+            background: var(--secondary-bg);
+        }
+        
+        .library-tabs::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            border-radius: 20px;
+            background-color: var(--secondary-bg);
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+        
+        .tab.active {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: var(--hover-bg);
+        }
+        
+        /* Основной контент */
+        .main-content {
+            padding-bottom: 80px;
+        }
+        
+        /* Быстрый доступ */
+        .quick-access {
+            margin: 30px 0;
+        }
+        
+        .quick-access-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .quick-access-item {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        
+        .quick-access-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .quick-access-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background-color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary-bg);
+        }
+        
+        .quick-access-info {
+            flex: 1;
+        }
+        
+        .quick-access-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .quick-access-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Мои плейлисты */
+        .my-playlists {
+            margin: 40px 0;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .see-all {
+            color: var(--text-secondary);
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        
+        .see-all:hover {
+            color: var(--text-primary);
+        }
+        
+        .playlists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        
+        .playlist-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .playlist-card:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .playlist-image {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .playlist-image i {
+            font-size: 40px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .playlist-count {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .playlist-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .playlist-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .play-button {
+            position: absolute;
+            right: 16px;
+            bottom: 70px;
+            width: 48px;
+            height: 48px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .playlist-card:hover .play-button {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Недавно прослушанное */
+        .recent-tracks {
+            margin: 40px 0;
+        }
+        
+        .track-list {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .track-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 100px 50px;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+        }
+        
+        .track-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .track-number {
+            color: var(--text-secondary);
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .track-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .track-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .track-artist {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .track-date {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .track-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0.2s, background-color 0.2s;
+        }
+        
+        .action-btn:hover {
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Нижняя панель навигации */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--primary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-item.active {
+            color: var(--accent);
+        }
+        
+        .nav-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        .nav-label {
+            font-size: 12px;
+        }
+        
+        /* Плеер */
+        .mini-player {
+            position: fixed;
+            bottom: 70px;
+            left: 0;
+            right: 0;
+            background-color: var(--secondary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 999;
+        }
+        
+        .mini-player-track {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        
+        .mini-player-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background-color: #333;
+        }
+        
+        .mini-player-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .mini-player-track-name {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mini-player-track-artist {
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mini-player-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .mini-control-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: background-color 0.2s;
+        }
+        
+        .mini-control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .mini-play-btn {
+            width: 36px;
+            height: 36px;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .quick-access-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .playlists-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .library-title {
+                font-size: 24px;
+            }
+            
+            .create-playlist-btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .quick-access-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .playlists-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .track-item {
+                grid-template-columns: 40px 1fr 80px 40px;
+                padding: 10px 12px;
+            }
+            
+            .library-tabs {
+                gap: 5px;
+            }
+            
+            .tab {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя навигационная панель -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="#" class="logo">
+                <i class="fas fa-music"></i>
+                MusicStream
+            </a>
+            
+            <div class="user-actions">
+                <button class="notification-btn">
+                    <i class="far fa-bell"></i>
+                </button>
+                <button class="settings-btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Заголовок библиотеки -->
+    <header class="library-header">
+        <div class="container header-content">
+            <div>
+                <h1 class="library-title">Моя музыка</h1>
+                <p class="library-subtitle">Ваша личная музыкальная коллекция</p>
+            </div>
+            <button class="create-playlist-btn">
+                <i class="fas fa-plus"></i>
+                Создать плейлист
+            </button>
+        </div>
+        
+        <!-- Табы навигации -->
+        <div class="container">
+            <div class="library-tabs">
+                <div class="tab active">Плейлисты</div>
+                <div class="tab">Треки</div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="container">            
+            <!-- Мои плейлисты -->
+            <section class="my-playlists">
+                <div class="section-header">
+                    <h2 class="section-title">Мои плейлисты</h2>
+                    <a href="#" class="see-all">Показать все</a>
+                </div>
+                
+                <div class="playlists-grid">
+                    <!-- Создать новый плейлист -->
+                    <div class="playlist-card" id="createPlaylistCard">
+                        <div class="playlist-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="playlist-title">Создать плейлист</div>
+                        <div class="playlist-desc">Добавьте любимые треки</div>
+                    </div>
+                    
+                    <!-- Существующие плейлисты -->
+                    <div class="playlist-card">
+                        <div class="playlist-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="fas fa-music"></i>
+                            <span class="playlist-count">125</span>
+                        </div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="playlist-title">Любимое</div>
+                        <div class="playlist-desc">Обновлен 2 дня назад</div>
+                    </div>
+                    
+                    <div class="playlist-card">
+                        <div class="playlist-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="fas fa-music"></i>
+                            <span class="playlist-count">85</span>
+                        </div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="playlist-title">Для тренировки</div>
+                        <div class="playlist-desc">Энергичные треки</div>
+                    </div>
+                    
+                    <div class="playlist-card">
+                        <div class="playlist-image" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <i class="fas fa-music"></i>
+                            <span class="playlist-count">62</span>
+                        </div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="playlist-title">Релакс</div>
+                        <div class="playlist-desc">Для отдыха</div>
+                    </div>
+                    
+                    <div class="playlist-card">
+                        <div class="playlist-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                            <i class="fas fa-music"></i>
+                            <span class="playlist-count">48</span>
+                        </div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="playlist-title">Дорога</div>
+                        <div class="playlist-desc">Для путешествий</div>
+                    </div>
+                    
+                    <div class="playlist-card">
+                        <div class="playlist-image" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                            <i class="fas fa-music"></i>
+                            <span class="playlist-count">73</span>
+                        </div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="playlist-title">Вечеринка</div>
+                        <div class="playlist-desc">Танцевальные хиты</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Недавно прослушанное -->
+            <section class="recent-tracks">
+                <div class="section-header">
+                    <h2 class="section-title">Недавно прослушанное</h2>
+                    <a href="#" class="see-all">Показать все</a>
+                </div>
+                
+                <div class="track-list">
+                    <div class="track-item">
+                        <div class="track-number">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="track-info">
+                            <div class="track-name">Название трека 1</div>
+                            <div class="track-artist">Исполнитель 1</div>
+                        </div>
+                        <div class="track-date">Сегодня, 14:30</div>
+                        <div class="track-actions">
+                            <button class="action-btn">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="track-item">
+                        <div class="track-number">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="track-info">
+                            <div class="track-name">Название трека 2</div>
+                            <div class="track-artist">Исполнитель 2</div>
+                        </div>
+                        <div class="track-date">Сегодня, 12:15</div>
+                        <div class="track-actions">
+                            <button class="action-btn">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="track-item">
+                        <div class="track-number">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="track-info">
+                            <div class="track-name">Название трека 3</div>
+                            <div class="track-artist">Исполнитель 3</div>
+                        </div>
+                        <div class="track-date">Вчера, 20:45</div>
+                        <div class="track-actions">
+                            <button class="action-btn">
+                                <i class="fas fa-heart" style="color: var(--accent);"></i>
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="track-item">
+                        <div class="track-number">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="track-info">
+                            <div class="track-name">Название трека 4</div>
+                            <div class="track-artist">Исполнитель 4</div>
+                        </div>
+                        <div class="track-date">Вчера, 18:20</div>
+                        <div class="track-actions">
+                            <button class="action-btn">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="track-item">
+                        <div class="track-number">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="track-info">
+                            <div class="track-name">Название трека 5</div>
+                            <div class="track-artist">Исполнитель 5</div>
+                        </div>
+                        <div class="track-date">2 дня назад</div>
+                        <div class="track-actions">
+                            <button class="action-btn">
+                                <i class="fas fa-heart" style="color: var(--accent);"></i>
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- Мини-плеер -->
+    <div class="mini-player">
+        <div class="mini-player-track">
+            <div class="mini-player-image"></div>
+            <div class="mini-player-info">
+                <div class="mini-player-track-name">Название трека 1</div>
+                <div class="mini-player-track-artist">Исполнитель 1</div>
+            </div>
+        </div>
+        
+        <div class="mini-player-controls">
+            <button class="mini-control-btn">
+                <i class="far fa-heart"></i>
+            </button>
+            <button class="mini-control-btn mini-play-btn">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="mini-control-btn">
+                <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Нижняя панель навигации -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <a href="#" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">Главная</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-search nav-icon"></i>
+                <span class="nav-label">Поиск</span>
+            </a>
+            
+            <a href="#" class="nav-item active">
+                <i class="fas fa-book nav-icon"></i>
+                <span class="nav-label">Библиотека</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">Профиль</span>
+            </a>
+        </div>
+    </nav>
+    
+    <script>
+        // JavaScript для страницы библиотеки
+        document.addEventListener('DOMContentLoaded', function() {
+            // Табы навигации
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const tabName = this.textContent;
+                    console.log(`Переключено на вкладку: ${tabName}`);
+                    // Здесь можно добавить загрузку контента для выбранной вкладки
+                });
+            });
+            
+            // Создание нового плейлиста
+            const createPlaylistCard = document.getElementById('createPlaylistCard');
+            createPlaylistCard.addEventListener('click', function() {
+                console.log('Создание нового плейлиста');
+                // Здесь можно добавить открытие формы создания плейлиста
+                alert('Форма создания плейлиста будет открыта здесь');
+            });
+            
+            // Воспроизведение плейлиста
+            const playlistCards = document.querySelectorAll('.playlist-card:not(#createPlaylistCard)');
+            playlistCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (!e.target.closest('.play-button')) {
+                        const playlistName = this.querySelector('.playlist-title').textContent;
+                        console.log(`Открытие плейлиста: ${playlistName}`);
+                        // Здесь можно добавить переход на страницу плейлиста
+                    }
+                });
+                
+                // Кнопка play в карточке
+                const playBtn = card.querySelector('.play-button');
+                if (playBtn) {
+                    playBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const playlistName = this.closest('.playlist-card').querySelector('.playlist-title').textContent;
+                        console.log(`Воспроизведение плейлиста: ${playlistName}`);
+                        
+                        // Обновляем мини-плеер
+                        document.querySelector('.mini-player-track-name').textContent = playlistName;
+                        document.querySelector('.mini-player-track-artist').textContent = 'Плейлист';
+                        
+                        // Меняем иконку play/pause
+                        const miniPlayBtn = document.querySelector('.mini-play-btn i');
+                        if (miniPlayBtn.classList.contains('fa-play')) {
+                            miniPlayBtn.classList.remove('fa-play');
+                            miniPlayBtn.classList.add('fa-pause');
+                        }
+                    });
+                }
+            });
+            
+            // Обработка кнопок лайка
+            const likeButtons = document.querySelectorAll('.action-btn .fa-heart');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (this.classList.contains('far')) {
+                        this.classList.remove('far');
+                        this.classList.add('fas');
+                        this.style.color = 'var(--accent)';
+                    } else {
+                        this.classList.remove('fas');
+                        this.classList.add('far');
+                        this.style.color = '';
+                    }
+                });
+            });
+            
+            // Воспроизведение трека из списка
+            const trackItems = document.querySelectorAll('.track-item');
+            trackItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.closest('.track-actions')) {
+                        const trackName = this.querySelector('.track-name').textContent;
+                        const trackArtist = this.querySelector('.track-artist').textContent;
+                        
+                        // Обновляем мини-плеер
+                        document.querySelector('.mini-player-track-name').textContent = trackName;
+                        document.querySelector('.mini-player-track-artist').textContent = trackArtist;
+                        
+                        // Меняем иконку play/pause
+                        const playBtn = document.querySelector('.mini-play-btn i');
+                        if (playBtn.classList.contains('fa-play')) {
+                            playBtn.classList.remove('fa-play');
+                            playBtn.classList.add('fa-pause');
+                        }
+                    }
+                });
+            });
+            
+            // Управление мини-плеером
+            const miniPlayBtn = document.querySelector('.mini-play-btn');
+            miniPlayBtn.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('fa-play')) {
+                    icon.classList.remove('fa-play');
+                    icon.classList.add('fa-pause');
+                } else {
+                    icon.classList.remove('fa-pause');
+                    icon.classList.add('fa-play');
+                }
+            });
+            
+            // Лайк в мини-плеере
+            const miniLikeBtn = document.querySelector('.mini-control-btn .fa-heart');
+            if (miniLikeBtn) {
+                miniLikeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (this.classList.contains('far')) {
+                        this.classList.remove('far');
+                        this.classList.add('fas');
+                        this.style.color = 'var(--accent)';
+                    } else {
+                        this.classList.remove('fas');
+                        this.classList.add('far');
+                        this.style.color = '';
+                    }
+                });
+            }
+            
+            // Навигация
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const page = this.querySelector('.nav-label').textContent;
+                    console.log(`Переход на страницу: ${page}`);
+                });
+            });
+            
+            // Кнопка создания плейлиста в заголовке
+            const createPlaylistBtn = document.querySelector('.create-playlist-btn');
+            createPlaylistBtn.addEventListener('click', function() {
+                console.log('Создание нового плейлиста');
+                // Здесь можно добавить открытие формы создания плейлиста
+                alert('Форма создания плейлиста будет открыта здесь');
+            });
+            
+            // Быстрый доступ
+            const quickAccessItems = document.querySelectorAll('.quick-access-item');
+            quickAccessItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const title = this.querySelector('.quick-access-title').textContent;
+                    console.log(`Открытие: ${title}`);
+                    // Здесь можно добавить переход к соответствующему разделу
+                });
+            });
+        });
+    </script>
+</body>
+</html>

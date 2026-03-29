@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тарифы - MusicStream</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #181818;
+            --card-bg: #1e1e1e;
+            --hover-bg: #282828;
+            --accent: #ffdb4d;
+            --accent-hover: #ffcc00;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --success: #1db954;
+            --danger: #e22134;
+            --info: #2196f3;
+            --purple: #9c27b0;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-premium: linear-gradient(135deg, #f8c300 0%, #ffdb4d 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+			background-image: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Навигационная панель */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .logo i {
+            margin-right: 8px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+        
+        .nav-link.active {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        /* Основной контент */
+        .main-content {
+            padding-top: 100px;
+            padding-bottom: 80px;
+        }
+        
+        /* Заголовок страницы */
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .page-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 36px;
+            }
+        }
+        
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        
+        /* Переключатель периодов */
+        .period-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+        
+        .toggle-wrapper {
+            background-color: var(--secondary-bg);
+            border-radius: 30px;
+            padding: 5px;
+            display: inline-flex;
+        }
+        
+        .period-option {
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .period-option.active {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        /* Тарифные карточки */
+        .plans-section {
+            margin-bottom: 60px;
+        }
+        
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .plan-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 40px 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .plan-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .plan-card.popular {
+            border: 2px solid var(--accent);
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            padding: 5px 40px;
+            font-size: 12px;
+            font-weight: 600;
+            transform: rotate(45deg);
+        }
+        
+        .plan-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .plan-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .plan-price {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .price-amount {
+            font-size: 48px;
+            font-weight: 800;
+        }
+        
+        .price-period {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .plan-savings {
+            color: var(--success);
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .plan-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        
+        .plan-features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+        
+        .plan-features i {
+            color: var(--success);
+            font-size: 14px;
+        }
+        
+        .plan-features .disabled {
+            color: var(--text-muted);
+        }
+        
+        .plan-features .disabled i {
+            color: var(--text-muted);
+        }
+        
+        .plan-button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        
+        .plan-button.primary {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        .plan-button.primary:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .plan-button.secondary {
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+        }
+        
+        .plan-button.secondary:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .current-plan {
+            background-color: var(--success);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            opacity: 0.8;
+            cursor: default;
+        }
+        
+        /* FAQ секция */
+        .faq-section {
+            max-width: 800px;
+            margin: 0 auto 60px;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .faq-item {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 20px;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .faq-question:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s, padding 0.3s;
+        }
+        
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px;
+            max-height: 500px;
+        }
+        
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+        
+        .faq-question i {
+            transition: transform 0.3s;
+            color: var(--text-secondary);
+        }
+        
+        /* Модальное окно оплаты */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 25px 25px 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: background-color 0.2s;
+        }
+        
+        .modal-close:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .modal-content {
+            padding: 25px;
+        }
+        
+        /* Форма оплаты */
+        .payment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .payment-summary {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .summary-total {
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            padding: 12px 15px;
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            border-color: var(--accent);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        /* Способы оплаты */
+        .payment-methods {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .payment-method {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        
+        .payment-method:hover {
+            border-color: var(--accent);
+        }
+        
+        .payment-method.active {
+            border-color: var(--accent);
+            background-color: rgba(255, 219, 77, 0.05);
+        }
+        
+        .payment-icon {
+            font-size: 32px;
+        }
+        
+        .payment-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        /* Кнопка оплаты */
+        .pay-button {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+        }
+        
+        .pay-button:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .pay-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Безопасность */
+        .security-notice {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            z-index: 3000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(100%);
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .notification.error {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        /* Подвал */
+        .footer {
+            background-color: var(--secondary-bg);
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        @media (max-width: 768px) {
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .footer-link {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .footer-link:hover {
+            color: var(--text-primary);
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .period-option {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .plan-card {
+                padding: 30px 20px;
+            }
+            
+            .price-amount {
+                font-size: 36px;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .plan-card {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* Загрузка */
+        .loading {
+            position: relative;
+            color: transparent !important;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary-bg);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Баннер акции */
+        .promo-banner {
+            background: var(--gradient);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .promo-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .promo-highlight {
+            color: var(--accent);
+            font-weight: 800;
+        }
+        
+        /* Гарантия */
+        .guarantee {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        /* Дополнительные стили для платежного шлюза */
+        .payment-processing {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+        
+        .processing-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        
+        .check-icon {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            border-radius: 50%;
+            box-sizing: content-box;
+            border: 4px solid var(--success);
+        }
+        
+        .check-icon::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 60px;
+            border-top: none;
+            border-right: 4px solid var(--success);
+            border-bottom: 4px solid var(--success);
+            border-left: none;
+            left: 22px;
+            top: 5px;
+            transform: rotate(45deg);
+        }
+        
+        .invoice-details {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .invoice-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .invoice-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .download-receipt {
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .promo-code-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .promo-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        
+        .promo-form {
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .promo-form.active {
+            display: block;
+        }
+        
+        .promo-input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .promo-input {
+            flex: 1;
+            padding: 10px 15px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+        }
+        
+        .apply-promo-btn {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .promo-success {
+            color: var(--success);
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .promo-error {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигационная панель -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="#" class="logo">
+                <i class="fas fa-music"></i>
+                MusicStream
+            </a>
+        </div>
+    </nav>
+    
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Заголовок -->
+            <header class="page-header">
+                <h1 class="page-title">Выберите свой план подписки</h1>
+                <p class="page-subtitle">
+                    Получите доступ ко всем функциям MusicStream. Отмена в любой момент.
+                    <span style="color: var(--accent); font-weight: 600;">Первый месяц бесплатно</span> для новых подписчиков.
+                </p>
+            </header>
+            
+            <!-- Баннер акции -->
+            <div class="promo-banner">
+                <div class="promo-text">
+                    🎉 <span class="promo-highlight">Специальное предложение:</span> При оплате годового тарифа получите 2 месяца в подарок!
+                </div>
+            </div>
+            
+            <!-- Переключатель периодов -->
+            <div class="period-toggle">
+                <div class="toggle-wrapper">
+                    <div class="period-option active" data-period="monthly">Ежемесячно</div>
+                    <div class="period-option" data-period="yearly">Ежегодно (выгоднее!)</div>
+                </div>
+            </div>
+            
+            <!-- Тарифные карточки -->
+            <section class="plans-section">
+                <div class="plans-grid">
+                    <!-- Бесплатный тариф -->
+                    <div class="plan-card">
+                        <div class="plan-header">
+                            <div class="plan-name">Бесплатный</div>
+                            <div class="plan-price">
+                                <span class="price-amount">0₽</span>
+                                <span class="price-period">/месяц</span>
+                            </div>
+                        </div>
+                        
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Случайная реклама</li>
+                            <li><i class="fas fa-check"></i> Стандартное качество звука</li>
+                        </ul>
+                        
+                        <button class="plan-button secondary current-plan">
+                            <i class="fas fa-check-circle"></i>
+                            Текущий план
+                        </button>
+                    </div>
+                    
+                    <!-- Премиум тариф -->
+                    <div class="plan-card popular">
+                        <div class="popular-badge">Популярный</div>
+                        
+                        <div class="plan-header">
+                            <div class="plan-name">Премиум</div>
+                            <div class="plan-price monthly-price">
+                                <span class="price-amount">299₽</span>
+                                <span class="price-period">/месяц</span>
+                            </div>
+                            <div class="plan-price yearly-price" style="display: none;">
+                                <span class="price-amount">2,990₽</span>
+                                <span class="price-period">/год</span>
+                            </div>
+                            <div class="plan-savings yearly-price" style="display: none;">
+                                <i class="fas fa-percentage"></i>
+                                Экономия 598₽ по сравнению с ежемесячной оплатой
+                            </div>
+                        </div>
+                        
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Без рекламы</li>
+                            <li><i class="fas fa-check"></i> Высокое качество звука</li>
+                            <li><i class="fas fa-check"></i> Персонализированные плейлисты</li>
+                        </ul>
+                        
+                        <button class="plan-button primary choose-plan" data-plan="premium">
+                            Выбрать Премиум
+                        </button>
+                    </div>
+            </section>
+            
+            <!-- Гарантия -->
+            <div class="guarantee">
+                <i class="fas fa-shield-alt" style="color: var(--success);"></i>
+                <span>30-дневная гарантия возврата денег</span>
+            </div>
+            
+            <!-- FAQ -->
+            <section class="faq-section">
+                <h2 class="section-title">Часто задаваемые вопросы</h2>
+                
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Как работает бесплатный пробный период?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Новые пользователи получают 30 дней бесплатного доступа ко всем функциям Премиум подписки. Для активации необходимо указать платежные данные, но плата не будет списана до окончания пробного периода. Вы можете отменить подписку в любое время до окончания пробного периода.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Как происходит оплата?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Оплата производится банковской картой через безопасный платежный шлюз. Мы поддерживаем Visa, MasterCard, Мир. Платежи обрабатываются в защищенном режиме с использованием шифрования.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Можно ли отменить подписку?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Да, вы можете отменить подписку в любой момент. После отмены вы сохраните доступ до конца оплаченного периода. Автопродление будет отключено.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>В чем разница между ежемесячной и ежегодной подпиской?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>При ежегодной подписке вы получаете скидку до 20% по сравнению с ежемесячной оплатой. Функционал подписок идентичен, отличается только период оплате и стоимость.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Можно ли изменить тарифный план?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Да, вы можете перейти на другой тарифный план в любой момент. При переходе на более дорогой тариф будет произведен перерасчет. При переходе на более дешевый тариф разница будет зачтена в счет следующего платежа.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- Подвал -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="copyright">
+                © 2025 MusicStream. Все права защищены.
+            </div>
+            
+            <div class="footer-links">
+                <a href="#" class="footer-link">Политика конфиденциальности</a>
+                <a href="#" class="footer-link">Условия использования</a>
+                <a href="#" class="footer-link">Поддержка</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Модальное окно оплаты -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="paymentModalTitle">Оформление подписки</h3>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-content">
+                <!-- Форма оплаты -->
+                <div id="paymentFormContainer">
+                    <form class="payment-form" id="paymentForm">
+                        <!-- Сводка заказа -->
+                        <div class="payment-summary" id="orderSummary">
+                            <div class="summary-row">
+                                <span>Тариф:</span>
+                                <span id="summaryPlan">Премиум</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Период:</span>
+                                <span id="summaryPeriod">Ежемесячно</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Цена:</span>
+                                <span id="summaryPrice">299₽</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>НДС (20%):</span>
+                                <span id="summaryTax">59.80₽</span>
+                            </div>
+                            <div class="summary-row" id="promoDiscountRow" style="display: none;">
+                                <span style="color: var(--success);">Скидка по промокоду:</span>
+                                <span style="color: var(--success);" id="summaryPromoDiscount">-0₽</span>
+                            </div>
+                            <div class="summary-row summary-total">
+                                <span>Итого к оплате:</span>
+                                <span id="summaryTotal">358.80₽</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Промокод -->
+                        <div class="promo-code-section">
+                            <div class="promo-toggle" id="promoToggle">
+                                <span>Есть промокод?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="promo-form" id="promoForm">
+                                <div class="promo-input-group">
+                                    <input type="text" class="promo-input" id="promoCode" placeholder="Введите промокод">
+                                    <button type="button" class="apply-promo-btn" id="applyPromoBtn">Применить</button>
+                                </div>
+                                <div class="promo-success" id="promoSuccess">
+                                    <i class="fas fa-check-circle"></i> Промокод успешно применен!
+                                </div>
+                                <div class="promo-error" id="promoError">
+                                    <i class="fas fa-exclamation-circle"></i> <span id="promoErrorText">Неверный промокод</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Способы оплаты -->
+                        <div class="payment-methods">
+                            <div class="payment-method active" data-method="card">
+                                <div class="payment-icon">
+                                    <i class="far fa-credit-card"></i>
+                                </div>
+                                <div class="payment-name">Карта</div>
+                            </div>
+                            
+                            <div class="payment-method" data-method="applepay">
+                                <div class="payment-icon">
+                                    <i class="fab fa-apple"></i>
+                                </div>
+                                <div class="payment-name">Apple Pay</div>
+                            </div>
+                            
+                            <div class="payment-method" data-method="googlepay">
+                                <div class="payment-icon">
+                                    <i class="fab fa-google"></i>
+                                </div>
+                                <div class="payment-name">Google Pay</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Форма для оплаты картой -->
+                        <div id="cardForm">
+                            <div class="form-group">
+                                <label class="form-label" for="cardNumber">Номер карты</label>
+                                <input type="text" id="cardNumber" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="cardExpiry">Срок действия</label>
+                                    <input type="text" id="cardExpiry" class="form-input" placeholder="MM/YY" maxlength="5" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="cardCvc">CVC/CVV</label>
+                                    <input type="text" id="cardCvc" class="form-input" placeholder="123" maxlength="3" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="cardName">Имя на карте</label>
+                                <input type="text" id="cardName" class="form-input" placeholder="IVAN IVANOV" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Форма для других способов оплаты -->
+                        <div id="otherPaymentForms" style="display: none;">
+                            <div class="form-group">
+                                <p>После подтверждения вы будете перенаправлены в безопасное окно для завершения оплаты через выбранный сервис.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Кнопка оплаты -->
+                        <button type="submit" class="pay-button" id="payButton">
+                            <i class="fas fa-lock"></i>
+                            Оплатить
+                        </button>
+                        
+                        <!-- Безопасность -->
+                        <div class="security-notice">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Ваши платежные данные защищены</span>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Обработка оплаты -->
+                <div class="payment-processing" id="paymentProcessing">
+                    <div class="processing-spinner"></div>
+                    <h3>Обработка платежа</h3>
+                    <p>Пожалуйста, подождите. Это займет несколько секунд...</p>
+                </div>
+                
+                <!-- Успешная оплата -->
+                <div class="payment-processing" id="paymentSuccess">
+                    <div class="success-checkmark">
+                        <div class="check-icon"></div>
+                    </div>
+                    <h3>Оплата успешно завершена!</h3>
+                    <p>Ваша подписка активирована. Теперь вы можете наслаждаться всеми преимуществами MusicStream.</p>
+                    
+                    <div class="invoice-details">
+                        <div class="invoice-row">
+                            <span>Номер заказа:</span>
+                            <span>MS-2025-001234</span>
+                        </div>
+                        <div class="invoice-row">
+                            <span>Тариф:</span>
+                            <span id="invoicePlan">Премиум</span>
+                        </div>
+                        <div class="invoice-row">
+                            <span>Сумма:</span>
+                            <span id="invoiceAmount">358.80₽</span>
+                        </div>
+                        <div class="invoice-row">
+                            <span>Дата:</span>
+                            <span id="invoiceDate">19.05.2025</span>
+                        </div>
+                        <div class="invoice-row">
+                            <span>Статус:</span>
+                            <span style="color: var(--success);">Оплачено</span>
+                        </div>
+                    </div>
+                    
+                    <a href="#" class="download-receipt" id="downloadReceipt">
+                        <i class="fas fa-download"></i>
+                        Скачать чек
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Уведомление -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Сообщение</span>
+    </div>
+    
+    <script>
+        // JavaScript для страницы тарифов и оплаты
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы
+            const periodOptions = document.querySelectorAll('.period-option');
+            const monthlyPrices = document.querySelectorAll('.monthly-price');
+            const yearlyPrices = document.querySelectorAll('.yearly-price');
+            const choosePlanButtons = document.querySelectorAll('.choose-plan');
+            const paymentModal = document.getElementById('paymentModal');
+            const closeModalBtn = document.getElementById('closeModal');
+            const paymentForm = document.getElementById('paymentForm');
+            const paymentFormContainer = document.getElementById('paymentFormContainer');
+            const paymentProcessing = document.getElementById('paymentProcessing');
+            const paymentSuccess = document.getElementById('paymentSuccess');
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            const cardForm = document.getElementById('cardForm');
+            const otherPaymentForms = document.getElementById('otherPaymentForms');
+            const payButton = document.getElementById('payButton');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            const faqItems = document.querySelectorAll('.faq-item');
+            const promoToggle = document.getElementById('promoToggle');
+            const promoForm = document.getElementById('promoForm');
+            const applyPromoBtn = document.getElementById('applyPromoBtn');
+            const promoCodeInput = document.getElementById('promoCode');
+            const promoSuccess = document.getElementById('promoSuccess');
+            const promoError = document.getElementById('promoError');
+            const promoErrorText = document.getElementById('promoErrorText');
+            const promoDiscountRow = document.getElementById('promoDiscountRow');
+            
+            // Данные о тарифах
+            const pricing = {
+                monthly: {
+                    premium: 299,
+                    family: 449
+                },
+                yearly: {
+                    premium: 2990,
+                    family: 4490
+                }
+            };
+            
+            // Данные о промокодах
+            const promoCodes = {
+                'MUSIC2025': { type: 'percent', value: 15, description: '15% скидка' },
+                'WELCOME10': { type: 'fixed', value: 100, description: '100₽ скидка' },
+                'STREAM50': { type: 'percent', value: 50, description: '50% скидка на первый месяц' }
+            };
+            
+            // Текущий выбор пользователя
+            let currentSelection = {
+                period: 'monthly',
+                plan: 'premium',
+                price: 299,
+                promoCode: null,
+                promoDiscount: 0
+            };
+            
+            // Переключение периодов (месяц/год)
+            periodOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const period = this.getAttribute('data-period');
+                    
+                    periodOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    if (period === 'monthly') {
+                        monthlyPrices.forEach(el => el.style.display = 'block');
+                        yearlyPrices.forEach(el => el.style.display = 'none');
+                        currentSelection.period = 'monthly';
+                    } else {
+                        monthlyPrices.forEach(el => el.style.display = 'none');
+                        yearlyPrices.forEach(el => el.style.display = 'block');
+                        currentSelection.period = 'yearly';
+                    }
+                    
+                    updatePrice();
+                });
+            });
+            
+            // Обновление цены в зависимости от выбора
+            function updatePrice() {
+                currentSelection.price = pricing[currentSelection.period][currentSelection.plan];
+                applyPromoDiscount();
+            }
+            
+            // Выбор тарифного плана
+            choosePlanButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const plan = this.getAttribute('data-plan');
+                    currentSelection.plan = plan;
+                    
+                    updatePrice();
+                    updateOrderSummary();
+                    openPaymentModal();
+                });
+            });
+            
+            // Обновление сводки заказа
+            function updateOrderSummary() {
+                const planNames = {
+                    premium: 'Премиум',
+                    family: 'Семейный'
+                };
+                
+                const periodNames = {
+                    monthly: 'Ежемесячно',
+                    yearly: 'Ежегодно'
+                };
+                
+                // Расчеты
+                const price = currentSelection.price;
+                const tax = price * 0.2; // НДС 20%
+                const discount = currentSelection.promoDiscount;
+                const total = price + tax - discount;
+                
+                // Обновление DOM
+                document.getElementById('summaryPlan').textContent = planNames[currentSelection.plan];
+                document.getElementById('summaryPeriod').textContent = periodNames[currentSelection.period];
+                document.getElementById('summaryPrice').textContent = `${price}₽`;
+                document.getElementById('summaryTax').textContent = `${tax.toFixed(2)}₽`;
+                document.getElementById('summaryTotal').textContent = `${total.toFixed(2)}₽`;
+                
+                // Промо-скидка
+                if (discount > 0) {
+                    promoDiscountRow.style.display = 'flex';
+                    document.getElementById('summaryPromoDiscount').textContent = `-${discount.toFixed(2)}₽`;
+                } else {
+                    promoDiscountRow.style.display = 'none';
+                }
+                
+                // Обновление для успешной оплаты
+                document.getElementById('invoicePlan').textContent = planNames[currentSelection.plan];
+                document.getElementById('invoiceAmount').textContent = `${total.toFixed(2)}₽`;
+                document.getElementById('invoiceDate').textContent = new Date().toLocaleDateString('ru-RU');
+            }
+            
+            // Открытие модального окна оплаты
+            function openPaymentModal() {
+                const modalTitle = document.getElementById('paymentModalTitle');
+                const planName = currentSelection.plan === 'premium' ? 'Премиум' : 'Семейный';
+                const periodName = currentSelection.period === 'monthly' ? 'ежемесячную' : 'ежегодную';
+                
+                modalTitle.textContent = `Оформление ${planName} подписки`;
+                paymentModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                // Сброс формы
+                resetPaymentForm();
+            }
+            
+            // Закрытие модального окна
+            function closePaymentModal() {
+                paymentModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                resetPaymentForm();
+            }
+            
+            // Сброс формы оплаты
+            function resetPaymentForm() {
+                paymentFormContainer.style.display = 'block';
+                paymentProcessing.style.display = 'none';
+                paymentSuccess.style.display = 'none';
+                
+                paymentForm.reset();
+                promoCodeInput.value = '';
+                promoSuccess.style.display = 'none';
+                promoError.style.display = 'none';
+                currentSelection.promoCode = null;
+                currentSelection.promoDiscount = 0;
+                updateOrderSummary();
+            }
+            
+            // Обработка промокода
+            promoToggle.addEventListener('click', function() {
+                const isActive = promoForm.classList.contains('active');
+                
+                if (isActive) {
+                    promoForm.classList.remove('active');
+                    this.querySelector('i').style.transform = 'rotate(0deg)';
+                } else {
+                    promoForm.classList.add('active');
+                    this.querySelector('i').style.transform = 'rotate(180deg)';
+                }
+            });
+            
+            applyPromoBtn.addEventListener('click', function() {
+                const code = promoCodeInput.value.trim().toUpperCase();
+                
+                if (!code) {
+                    showPromoError('Введите промокод');
+                    return;
+                }
+                
+                if (promoCodes[code]) {
+                    const promo = promoCodes[code];
+                    currentSelection.promoCode = code;
+                    
+                    // Расчет скидки
+                    if (promo.type === 'percent') {
+                        currentSelection.promoDiscount = currentSelection.price * (promo.value / 100);
+                    } else if (promo.type === 'fixed') {
+                        currentSelection.promoDiscount = Math.min(promo.value, currentSelection.price);
+                    }
+                    
+                    // Обновление интерфейса
+                    promoSuccess.style.display = 'block';
+                    promoError.style.display = 'none';
+                    updateOrderSummary();
+                    
+                    // Показать уведомление
+                    showNotification(`Промокод "${code}" применен! Скидка: ${promo.description}`, 'success');
+                } else {
+                    showPromoError('Неверный промокод');
+                    currentSelection.promoCode = null;
+                    currentSelection.promoDiscount = 0;
+                    updateOrderSummary();
+                }
+            });
+            
+            function showPromoError(message) {
+                promoErrorText.textContent = message;
+                promoError.style.display = 'block';
+                promoSuccess.style.display = 'none';
+            }
+            
+            // Применение скидки по промокоду
+            function applyPromoDiscount() {
+                if (currentSelection.promoCode && promoCodes[currentSelection.promoCode]) {
+                    const promo = promoCodes[currentSelection.promoCode];
+                    
+                    if (promo.type === 'percent') {
+                        currentSelection.promoDiscount = currentSelection.price * (promo.value / 100);
+                    } else if (promo.type === 'fixed') {
+                        currentSelection.promoDiscount = Math.min(promo.value, currentSelection.price);
+                    }
+                } else {
+                    currentSelection.promoDiscount = 0;
+                }
+            }
+            
+            // Выбор способа оплаты
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', function() {
+                    const paymentMethod = this.getAttribute('data-method');
+                    
+                    paymentMethods.forEach(m => m.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    if (paymentMethod === 'card') {
+                        cardForm.style.display = 'block';
+                        otherPaymentForms.style.display = 'none';
+                    } else {
+                        cardForm.style.display = 'none';
+                        otherPaymentForms.style.display = 'block';
+                    }
+                });
+            });
+            
+            // Форматирование номера карты
+            const cardNumberInput = document.getElementById('cardNumber');
+            cardNumberInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                let formattedValue = '';
+                
+                for (let i = 0; i < value.length; i++) {
+                    if (i > 0 && i % 4 === 0) {
+                        formattedValue += ' ';
+                    }
+                    formattedValue += value[i];
+                }
+                
+                e.target.value = formattedValue;
+            });
+            
+            // Форматирование срока действия карты
+            const cardExpiryInput = document.getElementById('cardExpiry');
+            cardExpiryInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                
+                if (value.length >= 2) {
+                    e.target.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                } else {
+                    e.target.value = value;
+                }
+            });
+            
+            // Обработка формы оплаты
+            paymentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Валидация формы
+                if (!validatePaymentForm()) {
+                    return;
+                }
+                
+                // Показать процесс оплаты
+                paymentFormContainer.style.display = 'none';
+                paymentProcessing.style.display = 'block';
+                
+                // Симуляция обработки платежа
+                setTimeout(function() {
+                    paymentProcessing.style.display = 'none';
+                    paymentSuccess.style.display = 'block';
+                    
+                    // Показать уведомление об успехе
+                    showNotification('Подписка успешно активирована!', 'success');
+                    
+                    // Записать в localStorage информацию о подписке
+                    localStorage.setItem('musicstream_subscription', JSON.stringify({
+                        plan: currentSelection.plan,
+                        period: currentSelection.period,
+                        active: true,
+                        expires: new Date(Date.now() + (currentSelection.period === 'monthly' ? 30 : 365) * 24 * 60 * 60 * 1000).toISOString(),
+                        price: currentSelection.price
+                    }));
+                }, 3000);
+            });
+            
+            // Валидация формы оплаты
+            function validatePaymentForm() {
+                const cardNumber = document.getElementById('cardNumber').value.replace(/\s+/g, '');
+                const cardExpiry = document.getElementById('cardExpiry').value;
+                const cardCvc = document.getElementById('cardCvc').value;
+                const cardName = document.getElementById('cardName').value.trim();
+                
+                // Проверка номера карты (простая проверка Luhn)
+                if (!validateCardNumber(cardNumber)) {
+                    showNotification('Неверный номер карты', 'error');
+                    return false;
+                }
+                
+                // Проверка срока действия
+                if (!validateCardExpiry(cardExpiry)) {
+                    showNotification('Неверный срок действия карты', 'error');
+                    return false;
+                }
+                
+                // Проверка CVC
+                if (!/^\d{3,4}$/.test(cardCvc)) {
+                    showNotification('Неверный CVC/CVV код', 'error');
+                    return false;
+                }
+                
+                // Проверка имени
+                if (cardName.length < 2) {
+                    showNotification('Введите имя на карте', 'error');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            // Проверка номера карты по алгоритму Луна
+            function validateCardNumber(cardNumber) {
+                if (!/^\d{13,19}$/.test(cardNumber)) return false;
+                
+                let sum = 0;
+                let isEven = false;
+                
+                for (let i = cardNumber.length - 1; i >= 0; i--) {
+                    let digit = parseInt(cardNumber.charAt(i));
+                    
+                    if (isEven) {
+                        digit *= 2;
+                        if (digit > 9) {
+                            digit -= 9;
+                        }
+                    }
+                    
+                    sum += digit;
+                    isEven = !isEven;
+                }
+                
+                return sum % 10 === 0;
+            }
+            
+            // Проверка срока действия карты
+            function validateCardExpiry(expiry) {
+                if (!/^\d{2}\/\d{2}$/.test(expiry)) return false;
+                
+                const [month, year] = expiry.split('/').map(Number);
+                const currentYear = new Date().getFullYear() % 100;
+                const currentMonth = new Date().getMonth() + 1;
+                
+                if (month < 1 || month > 12) return false;
+                if (year < currentYear) return false;
+                if (year === currentYear && month < currentMonth) return false;
+                
+                return true;
+            }
+            
+            // Показать уведомление
+            function showNotification(message, type) {
+                notificationText.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // FAQ аккордеон
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    item.classList.toggle('active');
+                });
+            });
+            
+            // Закрытие модального окна
+            closeModalBtn.addEventListener('click', closePaymentModal);
+            
+            // Закрытие по клику на оверлей
+            paymentModal.addEventListener('click', function(e) {
+                if (e.target === paymentModal) {
+                    closePaymentModal();
+                }
+            });
+            
+            // Закрытие по Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && paymentModal.classList.contains('active')) {
+                    closePaymentModal();
+                }
+            });
+            
+            // Скачивание чека
+            document.getElementById('downloadReceipt').addEventListener('click', function(e) {
+                e.preventDefault();
+                showNotification('Чек успешно скачан', 'success');
+            });
+            
+            // Инициализация
+            updateOrderSummary();
+        });
+    </script>
+</body>
+</html>

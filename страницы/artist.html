@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Исполнитель 1 - Музыкальный стриминговый сервис</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #181818;
+            --card-bg: #1e1e1e;
+            --hover-bg: #282828;
+            --accent: #ffdb4d;
+            --accent-hover: #ffcc00;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --success: #1db954;
+            --danger: #e22134;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+			background-image: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Навигационная панель */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            transition: background-color 0.2s;
+        }
+        
+        .back-btn:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .artist-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0.2s, background-color 0.2s;
+        }
+        
+        .action-btn:hover {
+            color: var(--text-primary);
+            background-color: var(--hover-bg);
+        }
+        
+        /* Заголовок исполнителя */
+        .artist-header {
+            padding-top: 70px;
+            padding-bottom: 30px;
+            background: linear-gradient(to bottom, #1a1a1a, #121212);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .artist-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            z-index: 0;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .artist-info {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .artist-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+        }
+        
+        .artist-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            flex-shrink: 0;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 576px) {
+            .artist-avatar {
+                width: 150px;
+                height: 150px;
+                font-size: 60px;
+            }
+        }
+        
+        .artist-details {
+            flex: 1;
+        }
+        
+        .artist-name {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .artist-name {
+                font-size: 36px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .artist-name {
+                font-size: 28px;
+            }
+        }
+        
+        .artist-genre {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .artist-stats {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .artist-bio {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 600px;
+        }
+        
+        .artist-actions-header {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .play-btn {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.2s;
+        }
+        
+        .play-btn:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .follow-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .follow-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .follow-btn.following {
+            background-color: var(--success);
+        }
+        
+        .more-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: background-color 0.2s;
+        }
+        
+        .more-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Основной контент */
+        .main-content {
+            padding-bottom: 80px;
+        }
+        
+        /* Табы навигации */
+        .artist-tabs {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        
+        .artist-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .artist-tabs::-webkit-scrollbar-track {
+            background: var(--secondary-bg);
+        }
+        
+        .artist-tabs::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        
+        .artist-tab {
+            padding: 10px 20px;
+            border-radius: 20px;
+            background-color: var(--secondary-bg);
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+        
+        .artist-tab.active {
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        .artist-tab:hover:not(.active) {
+            background-color: var(--hover-bg);
+        }
+        
+        /* Популярные треки */
+        .popular-tracks {
+            margin: 40px 0;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .see-all {
+            color: var(--text-secondary);
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        
+        .see-all:hover {
+            color: var(--text-primary);
+        }
+        
+        .track-list {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .track-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 100px 50px;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+        }
+        
+        .track-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .track-number {
+            color: var(--text-secondary);
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .track-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .track-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .track-artist {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .track-plays {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .track-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .action-btn-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0.2s, background-color 0.2s;
+        }
+        
+        .action-btn-small:hover {
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Альбомы */
+        .albums-section {
+            margin: 40px 0;
+        }
+        
+        .albums-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        
+        .album-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .album-card:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .album-image {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .album-image i {
+            font-size: 40px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .album-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .album-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .play-button {
+            position: absolute;
+            right: 16px;
+            bottom: 70px;
+            width: 48px;
+            height: 48px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .album-card:hover .play-button {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Похожие исполнители */
+        .related-artists {
+            margin: 40px 0;
+        }
+        
+        .artists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        
+        .artist-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        
+        .artist-card:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .artist-card-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        .artist-card-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .artist-card-genre {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Нижняя панель навигации */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--primary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-item.active {
+            color: var(--accent);
+        }
+        
+        .nav-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        .nav-label {
+            font-size: 12px;
+        }
+        
+        /* Мини-плеер */
+        .mini-player {
+            position: fixed;
+            bottom: 70px;
+            left: 0;
+            right: 0;
+            background-color: var(--secondary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 999;
+        }
+        
+        .mini-player-track {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        
+        .mini-player-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background-color: #333;
+        }
+        
+        .mini-player-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .mini-player-track-name {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mini-player-track-artist {
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mini-player-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .mini-control-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: background-color 0.2s;
+        }
+        
+        .mini-control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .mini-play-btn {
+            width: 36px;
+            height: 36px;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .albums-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .artists-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+            
+            .artist-card-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 30px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .track-item {
+                grid-template-columns: 40px 1fr 80px 40px;
+                padding: 10px 12px;
+            }
+            
+            .albums-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .artists-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .artist-stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .stat-item {
+                width: 45%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя навигационная панель -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <div class="artist-actions">
+                <button class="action-btn">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Заголовок исполнителя -->
+    <header class="artist-header">
+        <div class="container header-content">
+            <div class="artist-info">
+                <div class="artist-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                
+                <div class="artist-details">
+                    <h1 class="artist-name">Исполнитель 1</h1>
+                    <p class="artist-genre">Поп-музыка • 2020-настоящее время</p>
+                    
+                    <div class="artist-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">1.2M</span>
+                            <span class="stat-label">подписчиков</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">24</span>
+                            <span class="stat-label">треков</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">156M</span>
+                            <span class="stat-label">прослушиваний</span>
+                        </div>
+                    </div>
+                    
+                    <p class="artist-bio">
+                        Российский исполнитель в жанре поп-музыки. Дебютный альбом вышел в 2020 году и сразу занял верхние строчки чартов. 
+                        Известен своими мелодичными композициями и глубокими текстами.
+                    </p>
+                    
+                    <div class="artist-actions-header">
+                        <button class="play-btn" id="playArtistBtn">
+                            <i class="fas fa-play"></i>
+                            Слушать
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Популярные треки -->
+            <section class="popular-tracks">
+                <div class="section-header">
+                    <h2 class="section-title">Популярные треки</h2>
+                    <a href="#" class="see-all">Показать все</a>
+                </div>
+                
+                <div class="track-list">
+                    <div class="track-item">
+                        <div class="track-number">1</div>
+                        <div class="track-info">
+                            <div class="track-name">Хит №1</div>
+                            <div class="track-artist">Исполнитель 1</div>
+                        </div>
+                        <div class="track-plays">12.4M прослушиваний</div>
+                        <div class="track-actions">
+                            <button class="action-btn-small">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="action-btn-small">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="track-item">
+                        <div class="track-number">2</div>
+                        <div class="track-info">
+                            <div class="track-name">Хит №2</div>
+                            <div class="track-artist">Исполнитель 1</div>
+                        </div>
+                        <div class="track-plays">8.7M прослушиваний</div>
+                        <div class="track-actions">
+                            <button class="action-btn-small">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="action-btn-small">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="track-item">
+                        <div class="track-number">3</div>
+                        <div class="track-info">
+                            <div class="track-name">Хит №3</div>
+                            <div class="track-artist">Исполнитель 1</div>
+                        </div>
+                        <div class="track-plays">6.2M прослушиваний</div>
+                        <div class="track-actions">
+                            <button class="action-btn-small">
+                                <i class="fas fa-heart" style="color: var(--accent);"></i>
+                            </button>
+                            <button class="action-btn-small">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="track-item">
+                        <div class="track-number">4</div>
+                        <div class="track-info">
+                            <div class="track-name">Хит №4</div>
+                            <div class="track-artist">Исполнитель 1</div>
+                        </div>
+                        <div class="track-plays">5.8M прослушиваний</div>
+                        <div class="track-actions">
+                            <button class="action-btn-small">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="action-btn-small">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Альбомы -->
+            <section class="albums-section">
+                <div class="section-header">
+                    <h2 class="section-title">Альбомы</h2>
+                    <a href="#" class="see-all">Показать все</a>
+                </div>
+                
+                <div class="albums-grid">
+                    <div class="album-card">
+                        <div class="album-image">
+                            <i class="fas fa-compact-disc"></i>
+                        </div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="album-title">Новый альбом</div>
+                        <div class="album-info">2024 • 12 треков</div>
+                    </div>
+                    
+                    <div class="album-card">
+                        <div class="album-image">
+                            <i class="fas fa-compact-disc"></i>
+                        </div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="album-title">Летний релиз</div>
+                        <div class="album-info">2023 • 10 треков</div>
+                    </div>
+                    
+                    <div class="album-card">
+                        <div class="album-image">
+                            <i class="fas fa-compact-disc"></i>
+                        </div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="album-title">Дебютный альбом</div>
+                        <div class="album-info">2022 • 8 треков</div>
+                    </div>
+                    
+                    <div class="album-card">
+                        <div class="album-image">
+                            <i class="fas fa-compact-disc"></i>
+                        </div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="album-title">Синглы</div>
+                        <div class="album-info">2021 • 6 треков</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Похожие исполнители -->
+            <section class="related-artists">
+                <div class="section-header">
+                    <h2 class="section-title">Похожие исполнители</h2>
+                    <a href="#" class="see-all">Показать все</a>
+                </div>
+                
+                <div class="artists-grid">
+                    <div class="artist-card">
+                        <div class="artist-card-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="artist-card-name">Исполнитель 2</div>
+                        <div class="artist-card-genre">Поп-музыка</div>
+                    </div>
+                    
+                    <div class="artist-card">
+                        <div class="artist-card-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="artist-card-name">Исполнитель 3</div>
+                        <div class="artist-card-genre">Поп-рок</div>
+                    </div>
+                    
+                    <div class="artist-card">
+                        <div class="artist-card-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="artist-card-name">Исполнитель 4</div>
+                        <div class="artist-card-genre">Инди-поп</div>
+                    </div>
+                    
+                    <div class="artist-card">
+                        <div class="artist-card-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="artist-card-name">Исполнитель 5</div>
+                        <div class="artist-card-genre">Электропоп</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- Мини-плеер -->
+    <div class="mini-player">
+        <div class="mini-player-track">
+            <div class="mini-player-image"></div>
+            <div class="mini-player-info">
+                <div class="mini-player-track-name">Хит №1</div>
+                <div class="mini-player-track-artist">Исполнитель 1</div>
+            </div>
+        </div>
+        
+        <div class="mini-player-controls">
+            <button class="mini-control-btn">
+                <i class="far fa-heart"></i>
+            </button>
+            <button class="mini-control-btn mini-play-btn">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="mini-control-btn">
+                <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Нижняя панель навигации -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <a href="#" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">Главная</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-search nav-icon"></i>
+                <span class="nav-label">Поиск</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-book nav-icon"></i>
+                <span class="nav-label">Библиотека</span>
+            </a>
+            
+            <a href="#" class="nav-item active">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">Профиль</span>
+            </a>
+        </div>
+    </nav>
+    
+    <script>
+        // JavaScript для страницы исполнителя
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы
+            const backBtn = document.getElementById('backBtn');
+            const playArtistBtn = document.getElementById('playArtistBtn');
+            const followBtn = document.getElementById('followBtn');
+            const artistTabs = document.querySelectorAll('.artist-tab');
+            const trackItems = document.querySelectorAll('.track-item');
+            const albumCards = document.querySelectorAll('.album-card');
+            const artistCards = document.querySelectorAll('.artist-card');
+            
+            // Состояние
+            let isFollowing = false;
+            
+            // Кнопка "Назад"
+            backBtn.addEventListener('click', function() {
+                console.log('Возврат на предыдущую страницу');
+                // Здесь можно добавить навигацию назад
+                // window.history.back();
+            });
+            
+            // Кнопка "Слушать" (воспроизведение всех треков исполнителя)
+            playArtistBtn.addEventListener('click', function() {
+                console.log('Воспроизведение всех треков исполнителя');
+                
+                // Обновляем мини-плеер
+                document.querySelector('.mini-player-track-name').textContent = 'Хит №1';
+                document.querySelector('.mini-player-track-artist').textContent = 'Исполнитель 1';
+                
+                // Меняем иконку play/pause
+                const playBtn = document.querySelector('.mini-play-btn i');
+                if (playBtn.classList.contains('fa-play')) {
+                    playBtn.classList.remove('fa-play');
+                    playBtn.classList.add('fa-pause');
+                }
+            });
+            
+            // Форматирование чисел
+            function formatNumber(num) {
+                if (num >= 1000000) {
+                    return (num / 1000000).toFixed(1) + 'M';
+                } else if (num >= 1000) {
+                    return (num / 1000).toFixed(1) + 'K';
+                }
+                return num.toString();
+            }
+            
+            // Табы навигации
+            artistTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    artistTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const tabName = this.textContent;
+                    console.log(`Переключено на вкладку: ${tabName}`);
+                    // Здесь можно добавить загрузку контента для выбранной вкладки
+                });
+            });
+            
+            // Воспроизведение треков
+            trackItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.closest('.track-actions')) {
+                        const trackName = this.querySelector('.track-name').textContent;
+                        const trackArtist = this.querySelector('.track-artist').textContent;
+                        
+                        // Обновляем мини-плеер
+                        document.querySelector('.mini-player-track-name').textContent = trackName;
+                        document.querySelector('.mini-player-track-artist').textContent = trackArtist;
+                        
+                        // Меняем иконку play/pause
+                        const playBtn = document.querySelector('.mini-play-btn i');
+                        if (playBtn.classList.contains('fa-play')) {
+                            playBtn.classList.remove('fa-play');
+                            playBtn.classList.add('fa-pause');
+                        }
+                    }
+                });
+            });
+            
+            // Обработка кнопок лайка
+            const likeButtons = document.querySelectorAll('.action-btn-small .fa-heart');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (this.classList.contains('far')) {
+                        this.classList.remove('far');
+                        this.classList.add('fas');
+                        this.style.color = 'var(--accent)';
+                    } else {
+                        this.classList.remove('fas');
+                        this.classList.add('far');
+                        this.style.color = '';
+                    }
+                });
+            });
+            
+            // Воспроизведение альбома
+            albumCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (!e.target.closest('.play-button')) {
+                        const albumName = this.querySelector('.album-title').textContent;
+                        console.log(`Открытие альбома: ${albumName}`);
+                        // Здесь можно добавить переход на страницу альбома
+                    }
+                });
+                
+                // Кнопка play в карточке альбома
+                const playBtn = card.querySelector('.play-button');
+                if (playBtn) {
+                    playBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const albumName = this.closest('.album-card').querySelector('.album-title').textContent;
+                        console.log(`Воспроизведение альбома: ${albumName}`);
+                        
+                        // Обновляем мини-плеер
+                        document.querySelector('.mini-player-track-name').textContent = albumName;
+                        document.querySelector('.mini-player-track-artist').textContent = 'Исполнитель 1';
+                        
+                        // Меняем иконку play/pause
+                        const miniPlayBtn = document.querySelector('.mini-play-btn i');
+                        if (miniPlayBtn.classList.contains('fa-play')) {
+                            miniPlayBtn.classList.remove('fa-play');
+                            miniPlayBtn.classList.add('fa-pause');
+                        }
+                    });
+                }
+            });
+            
+            // Переход к похожим исполнителям
+            artistCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const artistName = this.querySelector('.artist-card-name').textContent;
+                    console.log(`Переход на страницу исполнителя: ${artistName}`);
+                    // Здесь можно добавить переход на страницу исполнителя
+                    alert(`Переход на страницу исполнителя: ${artistName}`);
+                });
+            });
+            
+            // Управление мини-плеером
+            const miniPlayBtn = document.querySelector('.mini-play-btn');
+            miniPlayBtn.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('fa-play')) {
+                    icon.classList.remove('fa-play');
+                    icon.classList.add('fa-pause');
+                } else {
+                    icon.classList.remove('fa-pause');
+                    icon.classList.add('fa-play');
+                }
+            });
+            
+            // Лайк в мини-плеере
+            const miniLikeBtn = document.querySelector('.mini-control-btn .fa-heart');
+            miniLikeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (this.classList.contains('far')) {
+                    this.classList.remove('far');
+                    this.classList.add('fas');
+                    this.style.color = 'var(--accent)';
+                } else {
+                    this.classList.remove('fas');
+                    this.classList.add('far');
+                    this.style.color = '';
+                }
+            });
+            
+            // Навигация
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const page = this.querySelector('.nav-label').textContent;
+                    console.log(`Переход на страницу: ${page}`);
+                });
+            });
+            
+            // Кнопки действий в навбаре
+            const shareBtn = document.querySelector('.action-btn .fa-share-alt').closest('.action-btn');
+            const moreBtn = document.querySelector('.action-btn .fa-ellipsis-h').closest('.action-btn');
+            
+            shareBtn.addEventListener('click', function() {
+                console.log('Поделиться исполнителем');
+                alert('Поделиться страницей исполнителя');
+            });
+            
+            moreBtn.addEventListener('click', function() {
+                console.log('Дополнительные опции');
+                alert('Дополнительные опции для исполнителя');
+            });
+            
+            // Кнопка "Еще" в заголовке
+            const moreBtnHeader = document.querySelector('.more-btn');
+            moreBtnHeader.addEventListener('click', function() {
+                console.log('Дополнительные действия для исполнителя');
+                alert('Меню дополнительных действий');
+            });
+        });
+    </script>
+</body>
+</html>

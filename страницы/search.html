@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск - Музыкальный стриминговый сервис</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #181818;
+            --card-bg: #1e1e1e;
+            --hover-bg: #282828;
+            --accent: #ffdb4d;
+            --accent-hover: #ffcc00;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --success: #1db954;
+            --danger: #e22134;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+			background-image: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Навигационная панель */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            transition: background-color 0.2s;
+        }
+        
+        .back-btn:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .search-bar {
+            flex: 1;
+            position: relative;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        
+        .filter-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+            transition: background-color 0.2s;
+        }
+        
+        .filter-btn:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        /* Основной контент */
+        .main-content {
+            padding-top: 70px;
+            padding-bottom: 80px;
+        }
+        
+        .section-header {
+            margin: 30px 0 20px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .section-subtitle {
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-size: 14px;
+        }
+        
+        /* Категории поиска */
+        .search-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .category-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: background-color 0.3s, transform 0.2s;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            background-color: var(--hover-bg);
+            transform: translateY(-5px);
+        }
+        
+        .category-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: var(--accent);
+        }
+        
+        .category-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        /* Список треков */
+        .track-list {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .track-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 100px 50px;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+        }
+        
+        .track-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .track-number {
+            color: var(--text-secondary);
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .track-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .track-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .track-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .track-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .track-artist {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .track-duration {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .track-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0
+		}
+        .action-btn:hover {
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Карточки исполнителей */
+        .artist-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .artist-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        
+        .artist-card:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .artist-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #333;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: var(--accent);
+        }
+        
+        .artist-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .artist-genre {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* История поиска */
+        .search-history {
+            margin-bottom: 30px;
+        }
+        
+        .history-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            padding-left: 10px;
+            border-radius: 4px;
+        }
+        
+        .history-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .history-query {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .history-icon {
+            color: var(--text-secondary);
+        }
+        
+        .remove-history {
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .history-item:hover .remove-history {
+            opacity: 1;
+        }
+        
+        /* Результаты поиска */
+        .search-results-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .results-count {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Нижняя панель навигации */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--primary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-item.active {
+            color: var(--accent);
+        }
+        
+        .nav-item:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        .nav-label {
+            font-size: 12px;
+        }
+        
+        /* Плеер */
+        .mini-player {
+            position: fixed;
+            bottom: 70px;
+            left: 0;
+            right: 0;
+            background-color: var(--secondary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 999;
+        }
+        
+        .mini-player-track {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        
+        .mini-player-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background-color: #333;
+        }
+        
+        .mini-player-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .mini-player-track-name {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mini-player-track-artist {
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mini-player-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .mini-control-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: background-color 0.2s;
+        }
+        
+        .mini-control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .mini-play-btn {
+            width: 36px;
+            height: 36px;
+            background-color: var(--accent);
+            color: var(--primary-bg);
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .search-categories {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+            
+            .artist-cards {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .artist-avatar {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .search-categories {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .artist-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .track-item {
+                grid-template-columns: 40px 1fr 80px 40px;
+                padding: 10px 12px;
+            }
+            
+            .artist-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя навигационная панель -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <button class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Поиск треков, альбомов, исполнителей" value="Поп-музыка" id="searchInput">
+            </div>
+            
+            <button class="filter-btn">
+                <i class="fas fa-sliders-h"></i>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="container">
+            <!-- История поиска -->
+            <div class="section-header">
+                <h2 class="section-title">Недавние запросы</h2>
+            </div>
+            
+            <div class="search-history">
+                <div class="history-item">
+                    <div class="history-query">
+                        <i class="fas fa-history history-icon"></i>
+                        <span>Поп-музыка</span>
+                    </div>
+                    <button class="remove-history">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="history-item">
+                    <div class="history-query">
+                        <i class="fas fa-history history-icon"></i>
+                        <span>Jazz</span>
+                    </div>
+                    <button class="remove-history">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="history-item">
+                    <div class="history-query">
+                        <i class="fas fa-history history-icon"></i>
+                        <span>Классика</span>
+                    </div>
+                    <button class="remove-history">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="history-item">
+                    <div class="history-query">
+                        <i class="fas fa-history history-icon"></i>
+                        <span>Электронная музыка</span>
+                    </div>
+                    <button class="remove-history">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            
+            <!-- Результаты поиска -->
+            <div class="section-header">
+                <div class="search-results-header">
+                    <h2 class="section-title">Результаты поиска</h2>
+                    <span class="results-count">Найдено: 24 трека</span>
+                </div>
+                <div class="section-subtitle">По запросу "Поп-музыка"</div>
+            </div>
+            
+            <!-- Треки -->
+            <div class="track-list">
+                <div class="track-item">
+                    <div class="track-number">1</div>
+                    <div class="track-info">
+                        <div class="track-image">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="track-details">
+                            <div class="track-name">Поп-хит 2024</div>
+                            <div class="track-artist">Исполнитель 1</div>
+                        </div>
+                    </div>
+                    <div class="track-duration">3:45</div>
+                    <div class="track-actions">
+                        <button class="action-btn">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="track-item">
+                    <div class="track-number">2</div>
+                    <div class="track-info">
+                        <div class="track-image">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="track-details">
+                            <div class="track-name">Летний сингл</div>
+                            <div class="track-artist">Исполнитель 2</div>
+                        </div>
+                    </div>
+                    <div class="track-duration">4:12</div>
+                    <div class="track-actions">
+                        <button class="action-btn">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="track-item">
+                    <div class="track-number">3</div>
+                    <div class="track-info">
+                        <div class="track-image">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="track-details">
+                            <div class="track-name">Радиохит</div>
+                            <div class="track-artist">Исполнитель 3</div>
+                        </div>
+                    </div>
+                    <div class="track-duration">3:28</div>
+                    <div class="track-actions">
+                        <button class="action-btn">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="track-item">
+                    <div class="track-number">4</div>
+                    <div class="track-info">
+                        <div class="track-image">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="track-details">
+                            <div class="track-name">Топ-чарт</div>
+                            <div class="track-artist">Исполнитель 4</div>
+                        </div>
+                    </div>
+                    <div class="track-duration">5:01</div>
+                    <div class="track-actions">
+                        <button class="action-btn">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Исполнители -->
+            <div class="section-header">
+                <h2 class="section-title">Исполнители</h2>
+            </div>
+            
+            <div class="artist-cards">
+                <div class="artist-card">
+                    <div class="artist-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="artist-name">Исполнитель 1</div>
+                    <div class="artist-genre">Поп-музыка</div>
+                </div>
+                
+                <div class="artist-card">
+                    <div class="artist-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="artist-name">Исполнитель 2</div>
+                    <div class="artist-genre">Поп-рок</div>
+                </div>
+                
+                <div class="artist-card">
+                    <div class="artist-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="artist-name">Исполнитель 3</div>
+                    <div class="artist-genre">Инди-поп</div>
+                </div>
+                
+                <div class="artist-card">
+                    <div class="artist-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="artist-name">Исполнитель 4</div>
+                    <div class="artist-genre">Электропоп</div>
+                </div>
+            </div>
+            
+            <!-- Альбомы -->
+            <div class="section-header">
+                <h2 class="section-title">Альбомы</h2>
+            </div>
+            
+            <div class="artist-cards">
+                <div class="artist-card">
+                    <div class="artist-avatar">
+                        <i class="fas fa-compact-disc"></i>
+                    </div>
+                    <div class="artist-name">Летний альбом</div>
+                    <div class="artist-genre">Исполнитель 1</div>
+                </div>
+                
+                <div class="artist-card">
+                    <div class="artist-avatar">
+                        <i class="fas fa-compact-disc"></i>
+                    </div>
+                    <div class="artist-name">Хиты 2024</div>
+                    <div class="artist-genre">Исполнитель 2</div>
+                </div>
+                
+                <div class="artist-card">
+                    <div class="artist-avatar">
+                        <i class="fas fa-compact-disc"></i>
+                    </div>
+                    <div class="artist-name">Новый релиз</div>
+                    <div class="artist-genre">Исполнитель 3</div>
+                </div>
+                
+                <div class="artist-card">
+                    <div class="artist-avatar">
+                        <i class="fas fa-compact-disc"></i>
+                    </div>
+                    <div class="artist-name">Золотая коллекция</div>
+                    <div class="artist-genre">Исполнитель 4</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Мини-плеер -->
+    <div class="mini-player">
+        <div class="mini-player-track">
+            <div class="mini-player-image"></div>
+            <div class="mini-player-info">
+                <div class="mini-player-track-name">Поп-хит 2024</div>
+                <div class="mini-player-track-artist">Исполнитель 1</div>
+            </div>
+        </div>
+        
+        <div class="mini-player-controls">
+            <button class="mini-control-btn">
+                <i class="far fa-heart"></i>
+            </button>
+            <button class="mini-control-btn mini-play-btn">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="mini-control-btn">
+                <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Нижняя панель навигации -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <a href="#" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">Главная</span>
+            </a>
+            
+            <a href="#" class="nav-item active">
+                <i class="fas fa-search nav-icon"></i>
+                <span class="nav-label">Поиск</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-book nav-icon"></i>
+                <span class="nav-label">Библиотека</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">Профиль</span>
+            </a>
+        </div>
+    </nav>
+    
+    <script>
+        // JavaScript для страницы поиска
+        document.addEventListener('DOMContentLoaded', function() {
+            // Обработка удаления истории поиска
+            const removeButtons = document.querySelectorAll('.remove-history');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const historyItem = this.closest('.history-item');
+                    historyItem.style.opacity = '0';
+                    historyItem.style.transform = 'translateX(-20px)';
+                    setTimeout(() => {
+                        historyItem.remove();
+                    }, 300);
+                });
+            });
+            
+            // Обработка кликов на истории поиска
+            const historyItems = document.querySelectorAll('.history-item');
+            historyItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.closest('.remove-history')) {
+                        const query = this.querySelector('span').textContent;
+                        document.getElementById('searchInput').value = query;
+                        // Здесь можно добавить поиск по этому запросу
+                        console.log(`Ищем: ${query}`);
+                    }
+                });
+            });
+            
+            // Обработка категорий поиска
+            const categoryCards = document.querySelectorAll('.category-card');
+            categoryCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const category = this.querySelector('.category-title').textContent;
+                    document.getElementById('searchInput').value = category;
+                    // Здесь можно добавить поиск по категории
+                    console.log(`Поиск по категории: ${category}`);
+                });
+            });
+            
+            // Обработка кнопок лайка
+            const likeButtons = document.querySelectorAll('.action-btn .fa-heart');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (this.classList.contains('far')) {
+                        this.classList.remove('far');
+                        this.classList.add('fas');
+                        this.style.color = 'var(--accent)';
+                    } else {
+                        this.classList.remove('fas');
+                        this.classList.add('far');
+                        this.style.color = '';
+                    }
+                });
+            });
+            
+            // Воспроизведение трека
+            const trackItems = document.querySelectorAll('.track-item');
+            trackItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.closest('.track-actions')) {
+                        const trackName = this.querySelector('.track-name').textContent;
+                        const trackArtist = this.querySelector('.track-artist').textContent;
+                        
+                        // Обновляем мини-плеер
+                        document.querySelector('.mini-player-track-name').textContent = trackName;
+                        document.querySelector('.mini-player-track-artist').textContent = trackArtist;
+                        
+                        // Меняем иконку play/pause
+                        const playBtn = document.querySelector('.mini-play-btn i');
+                        if (playBtn.classList.contains('fa-play')) {
+                            playBtn.classList.remove('fa-play');
+                            playBtn.classList.add('fa-pause');
+                        }
+                    }
+                });
+            });
+            
+            // Карточки исполнителей
+            const artistCards = document.querySelectorAll('.artist-card');
+            artistCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const artistName = this.querySelector('.artist-name').textContent;
+                    console.log(`Переход на страницу исполнителя: ${artistName}`);
+                    // Здесь можно добавить переход на страницу исполнителя
+                });
+            });
+            
+            // Управление мини-плеером
+            const miniPlayBtn = document.querySelector('.mini-play-btn');
+            miniPlayBtn.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('fa-play')) {
+                    icon.classList.remove('fa-play');
+                    icon.classList.add('fa-pause');
+                } else {
+                    icon.classList.remove('fa-pause');
+                    icon.classList.add('fa-play');
+                }
+            });
+            
+            // Лайк в мини-плеере
+            const miniLikeBtn = document.querySelector('.mini-control-btn .fa-heart');
+            miniLikeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (this.classList.contains('far')) {
+                    this.classList.remove('far');
+                    this.classList.add('fas');
+                    this.style.color = 'var(--accent)';
+                } else {
+                    this.classList.remove('fas');
+                    this.classList.add('far');
+                    this.style.color = '';
+                }
+            });
+            
+            // Навигация
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const page = this.querySelector('.nav-label').textContent;
+                    console.log(`Переход на страницу: ${page}`);
+                });
+            });
+            
+            // Кнопка "Назад"
+            const backBtn = document.querySelector('.back-btn');
+            backBtn.addEventListener('click', function() {
+                console.log('Возврат на предыдущую страницу');
+                // Здесь можно добавить навигацию назад
+            });
+            
+            // Кнопка фильтра
+            const filterBtn = document.querySelector('.filter-btn');
+            filterBtn.addEventListener('click', function() {
+                console.log('Открыть фильтры поиска');
+                // Здесь можно добавить открытие модального окна с фильтрами
+            });
+        });
+    </script>
+</body>
+</html>
